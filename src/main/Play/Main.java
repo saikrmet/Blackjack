@@ -12,6 +12,10 @@ public class Main {
      * @throws Exception if the file cannot be read.
      */
     public static void main(String[] args) throws Exception {
+        playGame(args);
+    }
+
+    public static void playGame(String[] args) throws Exception {
         String filePath = args[0];
         Parser parser = new Parser();
         parser.readFile(filePath);
