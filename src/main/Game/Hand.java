@@ -55,7 +55,7 @@ public class Hand {
         if (!this.hasAce) {
             return computeHardValue();
         }
-        return computeHardValue() - 10;
+        return computeHardValue() + 10;
     }
 
     private boolean determineAce() {

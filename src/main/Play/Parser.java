@@ -8,22 +8,39 @@ import main.Game.*;
 import main.Game.Card.Suit;
 import main.Game.Card.Rank;
 
+/**
+ * A representation of a CSV File Parser.
+ */
 public class Parser {
-
+    /**
+     * The path to the CSV file.
+     */
     private String filePath;
-
+    /**
+     * A list of all the games played, in string form.
+     */
     private List<String> listOfGames;
-
+    /**
+     * A mapping of each possible input letter in the unicode representation of a card
+     * to the suit it represents.
+     */
     private final ImmutableMap<Character, Card.Suit> suitMap = ImmutableMap.of(
             'A', Suit.SPADES, 'B', Suit.HEARTS, 'C', Suit.DIAMONDS, 'D', Suit.CLUBS);
-
+    /**
+     * A mapping of each possible input character in the unicode representation of a card
+     * to the rank it represents.
+     */
     private final ImmutableMap<Character, Card.Rank> rankMap = this.initRankMap();
 
-
+    /**
+     * Reads the CSV file and defines the listOfGames.
+     * @param filepath the path to the CSV file.
+     * @throws IOException if the file cannot be read.
+     */
     public void readFile(String filepath) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(filepath));
         this.filePath = filepath;
-
+        //Adds each line (each game) of the file as a new element in an ArrayList.
         ArrayList<String> listOfGames = new ArrayList<>();
         String line;
         while ((line = reader.readLine()) != null){
@@ -33,9 +50,14 @@ public class Parser {
         this.listOfGames = listOfGames;
     }
 
+    /**
+     * Makes decision whether to hit or stay for each game and writes it to the CSV file.
+     * @throws Exception if the game is invalid (i.e. not enough cards).
+     */
     public void play() throws Exception {
         ArrayList<Card> cardsInGame;
         StringBuilder output = new StringBuilder();
+        //Makes decision whether to hit or stay for each game.
         for (String strGame : this.listOfGames) {
             cardsInGame = this.generateGameState(strGame);
 
@@ -47,6 +69,12 @@ public class Parser {
         this.writeFile(output.toString());
     }
 
+    /**
+     * Takes the string representation of a game and changes it to an ArrayList of Cards.
+     * @param strGame the string representation of a Blackjack game
+     * @return the ArrayList of Cards representing the current game state.
+     * @throws Exception if the game is invalid (i.e. not enough cards).
+     */
     private ArrayList<Card> generateGameState(String strGame) throws Exception {
         String[] cards = strGame.split(",");
         if (cards.length < 10) {
@@ -54,7 +82,7 @@ public class Parser {
         }
 
         ArrayList<Card> cardsInGame = new ArrayList<>();
-
+        //convert unicode representations to actual cards with ranks and suits.
         for (String card: cards) {
             if (checkValidCard(card)) {
                 Card.Suit cardSuit = suitMap.get(card.charAt(3));
@@ -65,12 +93,23 @@ public class Parser {
         return cardsInGame;
     }
 
+    /**
+     * Checks whether a card is valid or not.
+     * @param card the string representation of a card.
+     * @return a boolean indicating whether the unicode representation of a card is valid or not.
+     */
     private boolean checkValidCard(String card) {
         //invalid unicode string
         return (card.length() == 5) && (card.startsWith("1F0")) && (suitMap.containsKey(card.charAt(3))) &&
                 (rankMap.containsKey(card.charAt(4)));
     }
 
+    /**
+     * Returns the string representation of a game, but with the HIT or STAY decision included.
+     * @param hand the player's hand.
+     * @param strGame the string representation of a game without the decision included.
+     * @return the string representation of a game, but with the HIT or STAY decision included
+     */
     private String generateOutputLine(Hand hand, String strGame) {
         String decision;
         if (hand.playHit()) {
@@ -82,12 +121,21 @@ public class Parser {
 
     }
 
+    /**
+     * Writes a string to a file.
+     * @param contents the string to be written to the file.
+     * @throws IOException if the file path is invalid.
+     */
     private void writeFile(String contents) throws IOException {
         FileWriter writer = new FileWriter(this.filePath);
         writer.write(contents);
         writer.close();
     }
 
+    /**
+     * Creates the immutable mapping of each unicode character to its rank.
+     * @return the immutable mapping of each unicode character to its rank.
+     */
     private ImmutableMap<Character, Card.Rank> initRankMap() {
         Map<Character, Card.Rank> rankMap = new HashMap<>();
         rankMap.put('1', Rank.ACE);
