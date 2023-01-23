@@ -50,7 +50,7 @@ public class Hand {
     }
 
     /**
-     * Returms the soft value of the hand.
+     * Returns the soft value of the hand.
      * @return the soft value of the hand.
      */
     public Integer getSoftValue() {
@@ -81,7 +81,7 @@ public class Hand {
      * @return the hard value of the hand.
      */
     private int computeHardValue() {
-        int sum = 0;
+        Integer sum = 0;
         for (Card card : this.cards) {
             sum += rankMap.get(card.getRank());
         }
@@ -118,10 +118,12 @@ public class Hand {
      */
     private ImmutableMap<Rank, Integer> initializeRankMap() {
         Map<Rank, Integer> rankMap = new HashMap<>();
-        int rankVal = 2;
+        int rankVal = 0;
         for (Rank rank : Rank.values()) {
+            if (rankVal < 10) {
+                rankVal += 1;
+            }
             rankMap.put(rank, rankVal);
-            rankVal += 1;
         }
         return ImmutableMap.copyOf(rankMap);
     }
