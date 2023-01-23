@@ -62,7 +62,7 @@ public class Parser {
             cardsInGame = this.generateGameState(strGame);
 
             //Player dealer = new Player(new HashSet<>(Collections.singleton(cardsInGame.get(0))));
-            Player me = new Player(new HashSet<>(cardsInGame.subList(8, cardsInGame.size())));
+            Player me = new Player(new HashSet<>(cardsInGame.subList(1, cardsInGame.size())));
 
             output.append(generateOutputLine(me.getHand(), strGame));
         }
