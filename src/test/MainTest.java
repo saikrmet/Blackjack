@@ -51,6 +51,15 @@ class MainTest {
         assertEquals(expectedContents, fileContents);
     }
 
+    @Test
+    void testCSV2() throws Exception {
+        Main.playGame(new String[]{"src/test/CSVFiles/tests/f2.csv"});
+        String filePath = userDir + "/src/test/CSVFiles/tests/f2.csv";
+
+        String fileContents = Files.readString(Paths.get(filePath));
+        //assertEquals(expectedContents, fileContents);
+    }
+
 
     private static void writeFileContents(int fileNum) throws IOException {
         String filePath = userDir + "/src/test/CSVFiles/tests/f" + fileNum + ".csv";

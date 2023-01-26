@@ -25,7 +25,8 @@ public class Parser {
      * to the suit it represents.
      */
     private final ImmutableMap<Character, Card.Suit> suitMap = ImmutableMap.of(
-            'A', Suit.SPADES, 'B', Suit.HEARTS, 'C', Suit.DIAMONDS, 'D', Suit.CLUBS);
+            'A', Suit.SPADES, 'B', Suit.HEARTS, 'C', Suit.DIAMONDS, 'D', Suit.CLUBS,
+            'a', Suit.SPADES, 'b', Suit.HEARTS, 'c', Suit.DIAMONDS, 'd', Suit.CLUBS);
     /**
      * A mapping of each possible input character in the unicode representation of a card
      * to the rank it represents.
@@ -57,17 +58,27 @@ public class Parser {
     public void play() throws Exception {
         ArrayList<Card> cardsInGame;
         StringBuilder output = new StringBuilder();
+
         //Makes decision whether to hit or stay for each game.
+        int counter = 0; // skip all odd lines as per CSV guidelines
         for (String strGame : this.listOfGames) {
+            
+            counter ++;
+
+            if (counter % 2 == 0) {
+                output.append(strGame + "\n");
+                continue;
+            }
+
             cardsInGame = this.generateGameState(strGame);
 
             //Player dealer = new Player(new HashSet<>(Collections.singleton(cardsInGame.get(0))));
-            Player me = new Player(new HashSet<>(cardsInGame.subList(1, cardsInGame.size())));
-
+            Player me = new Player(new HashSet<>(cardsInGame.subList(8, cardsInGame.size())));
             output.append(generateOutputLine(me.getHand(), strGame));
         }
         this.writeFile(output.toString());
     }
+
 
     /**
      * Takes the string representation of a game and changes it to an ArrayList of Cards.
@@ -77,6 +88,7 @@ public class Parser {
      */
     private ArrayList<Card> generateGameState(String strGame) throws Exception {
         String[] cards = strGame.split(",");
+
         if (cards.length < 10) {
             throw new Exception();
         }
@@ -84,10 +96,13 @@ public class Parser {
         ArrayList<Card> cardsInGame = new ArrayList<>();
         //convert unicode representations to actual cards with ranks and suits.
         for (String card: cards) {
+            card = card.strip();
             if (checkValidCard(card)) {
                 Card.Suit cardSuit = suitMap.get(card.charAt(3));
                 Card.Rank cardRank = rankMap.get(card.charAt(4));
                 cardsInGame.add(new Card(cardRank, cardSuit));
+            } else {
+                cardsInGame.add(null); // add null to indicate no card present
             }
         }
         return cardsInGame;
@@ -100,8 +115,8 @@ public class Parser {
      */
     private boolean checkValidCard(String card) {
         //invalid unicode string
-        return (card.length() == 5) && (card.startsWith("1F0")) && (suitMap.containsKey(card.charAt(3))) &&
-                (rankMap.containsKey(card.charAt(4)));
+        return (card.length() == 5) && ((card.startsWith("1F0")) || card.startsWith("1f0")) &&
+                (suitMap.containsKey(card.charAt(3))) && (rankMap.containsKey(card.charAt(4)));
     }
 
     /**
@@ -118,7 +133,6 @@ public class Parser {
             decision = "STAY";
         }
         return decision + strGame + "\n";
-
     }
 
     /**
@@ -151,6 +165,10 @@ public class Parser {
         rankMap.put('B', Rank.JACK);
         rankMap.put('D', Rank.QUEEN);
         rankMap.put('E', Rank.KING);
+        rankMap.put('a', Rank.TEN);
+        rankMap.put('b', Rank.JACK);
+        rankMap.put('d', Rank.QUEEN);
+        rankMap.put('e', Rank.KING);
 
         return ImmutableMap.copyOf(rankMap);
     }
