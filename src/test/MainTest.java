@@ -53,8 +53,8 @@ class MainTest {
 
     @Test
     void testCSV2() throws Exception {
-        Main.playGame(new String[]{"src/test/CSVFiles/tests/f2.csv"});
-        String filePath = userDir + "/src/test/CSVFiles/tests/f2.csv";
+        Main.playGame(new String[]{"src/test/CSVFiles/tests/providedHW1.csv"});
+        String filePath = userDir + "/src/test/CSVFiles/tests/providedHW1.csv";
 
         String fileContents = Files.readString(Paths.get(filePath));
         //assertEquals(expectedContents, fileContents);

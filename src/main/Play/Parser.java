@@ -62,7 +62,7 @@ public class Parser {
         //Makes decision whether to hit or stay for each game.
         int counter = 0; // skip all odd lines as per CSV guidelines
         for (String strGame : this.listOfGames) {
-            
+
             counter ++;
 
             if (counter % 2 == 0) {
