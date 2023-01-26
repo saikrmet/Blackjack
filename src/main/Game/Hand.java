@@ -128,6 +128,17 @@ public class Hand {
         return ImmutableMap.copyOf(rankMap);
     }
 
-
+    /**
+     * Returns the string representation of the card.
+     * @return the string representation of the card.
+     */
+    @Override
+    public final String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Card card : this.cards) {
+            sb.append(card.toString()).append(" + ");
+        }
+        return sb.substring(0, sb.length() - 3);
+    }
 
 }
