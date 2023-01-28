@@ -3,6 +3,7 @@ package main.Play;
 import java.io.*;
 import java.util.*;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import main.Game.*;
 import main.Game.Card.Suit;
@@ -62,7 +63,6 @@ public class Parser {
         //Makes decision whether to hit or stay for each game.
         int counter = 0; // skip all odd lines as per CSV guidelines
         for (String strGame : this.listOfGames) {
-
             counter ++;
 
             if (counter % 2 == 0) {
@@ -73,7 +73,8 @@ public class Parser {
             cardsInGame = this.generateGameState(strGame);
 
             //Player dealer = new Player(new HashSet<>(Collections.singleton(cardsInGame.get(0))));
-            Player me = new Player(new HashSet<>(cardsInGame.subList(8, cardsInGame.size())));
+            Player me = new Player(new HashSet<>(Preconditions.checkNotNull(
+                    cardsInGame.subList(8, cardsInGame.size()))));
             output.append(generateOutputLine(me.getHand(), strGame));
         }
         this.writeFile(output.toString());
@@ -90,7 +91,7 @@ public class Parser {
         String[] cards = strGame.split(",");
 
         if (cards.length < 10) {
-            throw new Exception();
+            throw new Exception("Invalid CSV format");
         }
 
         ArrayList<Card> cardsInGame = new ArrayList<>();
@@ -142,7 +143,7 @@ public class Parser {
      */
     private void writeFile(String contents) throws IOException {
         FileWriter writer = new FileWriter(this.filePath);
-        writer.write(contents);
+        writer.write(contents.trim());
         writer.close();
     }
 
