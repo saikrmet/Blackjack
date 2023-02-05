@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableMap;
 import main.Game.*;
 import main.Game.Card.Suit;
 import main.Game.Card.Rank;
+import main.Game.Strategy;
 
 /**
  * A representation of a CSV File Parser.
@@ -43,7 +44,7 @@ public class Parser {
         BufferedReader reader = new BufferedReader(new FileReader(filepath));
         this.filePath = filepath;
         //Adds each line (each game) of the file as a new element in an ArrayList.
-        ArrayList<String> listOfGames = new ArrayList<>();
+        List<String> listOfGames = new ArrayList<>();
         String line;
         while ((line = reader.readLine()) != null){
             listOfGames.add(line);
@@ -57,7 +58,7 @@ public class Parser {
      * @throws Exception if the game is invalid (i.e. not enough cards).
      */
     public void play() throws Exception {
-        ArrayList<Card> cardsInGame;
+        List<Card> cardsInGame;
         StringBuilder output = new StringBuilder();
 
         //Makes decision whether to hit or stay for each game.
@@ -72,10 +73,11 @@ public class Parser {
 
             cardsInGame = this.generateGameState(strGame);
 
-            //Player dealer = new Player(new HashSet<>(Collections.singleton(cardsInGame.get(0))));
+            Player dealer = new Player(new HashSet<>(Collections.singleton(cardsInGame.get(0))));
             Player me = new Player(new HashSet<>(Preconditions.checkNotNull(
                     cardsInGame.subList(8, cardsInGame.size()))));
-            output.append(generateOutputLine(me.getHand(), strGame));
+            Strategy strategy = new Strategy(List.of(dealer, me));
+            output.append(strategy.makeDecision().toString() + strGame + "\n");
         }
         this.writeFile(output.toString());
     }
@@ -87,14 +89,14 @@ public class Parser {
      * @return the ArrayList of Cards representing the current game state.
      * @throws Exception if the game is invalid (i.e. not enough cards).
      */
-    private ArrayList<Card> generateGameState(String strGame) throws Exception {
+    private List<Card> generateGameState(String strGame) throws Exception {
         String[] cards = strGame.split(",");
 
         if (cards.length < 10) {
             throw new Exception("Invalid CSV format");
         }
 
-        ArrayList<Card> cardsInGame = new ArrayList<>();
+        List<Card> cardsInGame = new ArrayList<>();
         //convert unicode representations to actual cards with ranks and suits.
         for (String card: cards) {
             card = card.strip();
@@ -118,22 +120,6 @@ public class Parser {
         //invalid unicode string
         return (card.length() == 5) && ((card.startsWith("1F0")) || card.startsWith("1f0")) &&
                 (suitMap.containsKey(card.charAt(3))) && (rankMap.containsKey(card.charAt(4)));
-    }
-
-    /**
-     * Returns the string representation of a game, but with the HIT or STAY decision included.
-     * @param hand the player's hand.
-     * @param strGame the string representation of a game without the decision included.
-     * @return the string representation of a game, but with the HIT or STAY decision included
-     */
-    private String generateOutputLine(Hand hand, String strGame) {
-        String decision;
-        if (hand.playHit()) {
-            decision = "HIT";
-        } else {
-            decision = "STAY";
-        }
-        return decision + strGame + "\n";
     }
 
     /**
