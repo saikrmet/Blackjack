@@ -9,6 +9,7 @@ import main.Game.Card.*;
  * A representation of a BlackJack hand.
  */
 public class Hand {
+
     /**
      * The cards in the player's hand.
      */
@@ -56,6 +57,8 @@ public class Hand {
     public Integer getSoftValue() {
         return this.softValue;
     }
+
+    public Integer getSize() { return this.cards.size();}
 
     /**
      * Naive strategy that determines whether the player hits or not.
