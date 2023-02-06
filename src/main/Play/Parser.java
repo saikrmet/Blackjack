@@ -5,6 +5,8 @@ import java.util.*;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.opencsv.*;
+import com.opencsv.exceptions.CsvValidationException;
 import main.Game.*;
 import main.Game.Card.Suit;
 import main.Game.Card.Rank;
@@ -26,14 +28,14 @@ public class Parser {
      * A mapping of each possible input letter in the unicode representation of a card
      * to the suit it represents.
      */
-    private final ImmutableMap<Character, Card.Suit> suitMap = ImmutableMap.of(
+    private static final ImmutableMap<Character, Card.Suit> suitMap = ImmutableMap.of(
             'A', Suit.SPADES, 'B', Suit.HEARTS, 'C', Suit.DIAMONDS, 'D', Suit.CLUBS,
             'a', Suit.SPADES, 'b', Suit.HEARTS, 'c', Suit.DIAMONDS, 'd', Suit.CLUBS);
     /**
      * A mapping of each possible input character in the unicode representation of a card
      * to the rank it represents.
      */
-    private final ImmutableMap<Character, Card.Rank> rankMap = this.initRankMap();
+    private static final ImmutableMap<Character, Card.Rank> rankMap = initRankMap();
 
     /**
      * Reads the CSV file and defines the listOfGames.
@@ -55,9 +57,10 @@ public class Parser {
 
     /**
      * Makes decision whether to hit or stay for each game and writes it to the CSV file.
-     * @throws Exception if the game is invalid (i.e. not enough cards).
+     * @param strategyParser the parser for the strategy containing relevant maps
+     * @throws Exception if input is invalid
      */
-    public void play() throws Exception {
+    public void play(StrategyParser strategyParser) throws Exception {
         List<Card> cardsInGame;
         StringBuilder output = new StringBuilder();
 
@@ -73,11 +76,11 @@ public class Parser {
 
             cardsInGame = this.generateGameState(strGame);
 
-            Player dealer = new Player(new HashSet<>(Collections.singleton(cardsInGame.get(0))));
-            Player me = new Player(new HashSet<>(Preconditions.checkNotNull(
+            Player dealer = new Player(new ArrayList<>(Collections.singleton(cardsInGame.get(0))));
+            Player me = new Player(new ArrayList<>(Preconditions.checkNotNull(
                     cardsInGame.subList(8, cardsInGame.size()))));
             Strategy strategy = new Strategy(List.of(dealer, me));
-            output.append(strategy.makeDecision().toString() + strGame + "\n");
+            output.append(strategy.makeDecision(strategyParser).toString() + Arrays.toString(strGame) + "\n");
         }
         this.writeFile(output.toString());
     }
@@ -137,7 +140,7 @@ public class Parser {
      * Creates the immutable mapping of each unicode character to its rank.
      * @return the immutable mapping of each unicode character to its rank.
      */
-    private ImmutableMap<Character, Card.Rank> initRankMap() {
+    private static ImmutableMap<Character, Card.Rank> initRankMap() {
         Map<Character, Card.Rank> rankMap = new HashMap<>();
         rankMap.put('1', Rank.ACE);
         rankMap.put('2', Rank.TWO);
