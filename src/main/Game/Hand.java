@@ -13,7 +13,7 @@ public class Hand {
     /**
      * The cards in the player's hand.
      */
-    private Set<Card> cards;
+    private List<Card> cards;
     /**
      * A boolean indicating whether or not the player has an ace.
      */
@@ -22,24 +22,20 @@ public class Hand {
      * The hard value of the player's hand.
      */
     private int hardValue;
-    /**
-     * The soft value of the player's hand.
-     */
-    private int softValue;
-    /**
-     * A mapping of each rank to its value in BlackJack.
-     */
-    private final ImmutableMap<Rank, Integer> rankMap = initializeRankMap();
 
     /**
      * Constructor for a hand.
      * @param cards the cards in the player's hand.
      */
-    public Hand(Set<Card> cards) {
+    public Hand(List<Card> cards) {
         this.cards = cards;
         this.hardValue = this.computeHardValue();
         this.hasAce = this.determineAce();
         this.softValue = this.computeSoftValue();
+    }
+
+    public List<Card> getCards() {
+        return this.cards;
     }
 
     /**
@@ -47,15 +43,15 @@ public class Hand {
      * @return the hard value of the hand.
      */
     public Integer getHardValue() {
-        return this.hardValue;
+        return this.computeHardValue();
     }
 
     /**
      * Returns the soft value of the hand.
      * @return the soft value of the hand.
      */
-    public Integer getSoftValue() {
-        return this.softValue;
+    public Integer getSoftValue() throws Exception {
+        return this.computeSoftValue();
     }
 
     public Integer getSize() { return this.cards.size();}
@@ -86,7 +82,7 @@ public class Hand {
     private int computeHardValue() {
         Integer sum = 0;
         for (Card card : this.cards) {
-            sum += rankMap.get(card.getRank());
+            sum += card.getRankValue();
         }
         return sum;
     }
@@ -116,20 +112,17 @@ public class Hand {
     }
 
     /**
-     * Initializes the rank map that maps card ranks to their BlackJack values.
-     * @return the rank map that maps card ranks to their BlackJack values.
+     * Determines whether a player's hand is a pair or not.
+     * @return a boolean indicating whether a player's hand is a pair or not.
      */
-    private ImmutableMap<Rank, Integer> initializeRankMap() {
-        Map<Rank, Integer> rankMap = new HashMap<>();
-        int rankVal = 0;
-        for (Rank rank : Rank.values()) {
-            if (rankVal < 10) {
-                rankVal += 1;
-            }
-            rankMap.put(rank, rankVal);
+    public boolean isPair() {
+        if (this.getSize() == 2) {
+            return (this.cards.get(0).getRank().equals(this.cards.get(1).getRank()));
+        }else{
+            return false;
         }
-        return ImmutableMap.copyOf(rankMap);
     }
+
 
     /**
      * Returns the string representation of the card.
