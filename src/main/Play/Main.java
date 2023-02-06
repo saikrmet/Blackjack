@@ -21,5 +21,7 @@ public class Main {
         StrategyParser strategyParser = new StrategyParser();
         parser.readFile(filePath);
         parser.play(strategyParser);
+        System.out.println("All operations successful. Results at " + filePath.substring(0, filePath.length() - 4)
+                + "-SOLVED.csv");
     }
 }
