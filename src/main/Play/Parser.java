@@ -23,7 +23,7 @@ public class Parser {
     /**
      * A list of all the games played, in string form.
      */
-    private List<String> listOfGames;
+    private List<String[]> listOfGames;
     /**
      * A mapping of each possible input letter in the unicode representation of a card
      * to the suit it represents.
@@ -42,16 +42,17 @@ public class Parser {
      * @param filepath the path to the CSV file.
      * @throws IOException if the file cannot be read.
      */
-    public void readFile(String filepath) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(filepath));
+    public void readFile(String filepath) throws IOException, CsvValidationException {
+        CSVReader csvReader = new CSVReaderBuilder(new FileReader(filepath)).build();
+        //BufferedReader reader = new BufferedReader(new FileReader(filepath));
         this.filePath = filepath;
         //Adds each line (each game) of the file as a new element in an ArrayList.
-        List<String> listOfGames = new ArrayList<>();
-        String line;
-        while ((line = reader.readLine()) != null){
+        List<String[]> listOfGames = new ArrayList<>();
+        String[] line;
+        while ((line = csvReader.readNext()) != null){
             listOfGames.add(line);
         }
-        reader.close();
+        csvReader.close();
         this.listOfGames = listOfGames;
     }
 
@@ -66,11 +67,11 @@ public class Parser {
 
         //Makes decision whether to hit or stay for each game.
         int counter = 0; // skip all odd lines as per CSV guidelines
-        for (String strGame : this.listOfGames) {
+        for (String[] strGame : this.listOfGames) {
             counter ++;
 
             if (counter % 2 == 0) {
-                output.append(strGame + "\n");
+                output.append(Arrays.toString(strGame)).append("\n");
                 continue;
             }
 
@@ -88,12 +89,13 @@ public class Parser {
 
     /**
      * Takes the string representation of a game and changes it to an ArrayList of Cards.
-     * @param strGame the string representation of a Blackjack game
+     * @param cards the string[] representation of a Blackjack game (array of strings representing
+     * potential cards)
      * @return the ArrayList of Cards representing the current game state.
      * @throws Exception if the game is invalid (i.e. not enough cards).
      */
-    private List<Card> generateGameState(String strGame) throws Exception {
-        String[] cards = strGame.split(",");
+    private List<Card> generateGameState(String[] cards) throws Exception {
+        //String[] cards = strGame.split(",");
 
         if (cards.length < 10) {
             throw new Exception("Invalid CSV format");
