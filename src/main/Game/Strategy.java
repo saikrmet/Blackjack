@@ -30,11 +30,20 @@ public class Strategy {
     }
 
 
-    public Decision makeDecision() {
-        if (me.getHand().getSize() == 2) {
-
+    public Decision makeDecision(StrategyParser strategyParser) throws Exception {
+        Hand myHand = me.getHand();
+        List<Card.Rank> hardHand = List.of(Card.Rank.JACK, Card.Rank.QUEEN, Card.Rank.KING);
+        if (myHand.isPair()) {
+            if (hardHand.contains(myHand.getCards().get(0).getRank())) {
+                return this.hardStrat(strategyParser);
+            } else {
+                return this.pairStrat(strategyParser);
+            }
+        } else if (me.getHand().getHasAce()){
+            return this.softStrat(strategyParser);
+        } else {
+            return this.hardStrat(strategyParser);
         }
-        return null;
     }
 
 
