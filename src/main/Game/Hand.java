@@ -19,6 +19,10 @@ public class Hand {
      */
     private boolean hasAce;
     /**
+     * A boolean indicating whether or not the player has a soft value.
+     */
+    private boolean isSoft;
+    /**
      * The hard value of the player's hand.
      */
     private int hardValue;
@@ -31,7 +35,7 @@ public class Hand {
         this.cards = cards;
         this.hardValue = this.computeHardValue();
         this.hasAce = this.determineAce();
-        this.softValue = this.computeSoftValue();
+        this.isSoft = this.determineSoft();
     }
 
     public List<Card> getCards() {
@@ -54,18 +58,30 @@ public class Hand {
         return this.computeSoftValue();
     }
 
+
+    /**
+     * Returns the size of the hand.
+     * @return the size of the hand.
+     */
     public Integer getSize() { return this.cards.size();}
 
     /**
-     * Naive strategy that determines whether the player hits or not.
-     * @return a boolean indicating whether the player hits or not.
+     * Returns a boolean indicating whether this hand has an ace.
+     * @return a boolean indicating whether this hand has an ace.
      */
-    public boolean playHit() {
-        if (this.computeHardValue() > 11) {
-            return false;
-        }
-        return this.computeSoftValue() <= 17;
-    }
+    public boolean getHasAce() {return this.hasAce;}
+
+//    /**
+//     * Naive strategy that determines whether the player hits or not.
+//     * @return a boolean indicating whether the player hits or not.
+//     */
+//    public boolean playHit() throws Exception {
+//        if (this.isSoft) {
+//            return this.computeSoftValue() <= 17;
+//        } else {
+//            return !(this.computeHardValue() > 11);
+//        }
+//    }
 
     /**
      * Adds a card to the player's hand.
@@ -91,11 +107,11 @@ public class Hand {
      * Computes the soft value of the hand based on the cards.
      * @return the soft value of the hand.
      */
-    private int computeSoftValue() {
-        if (!this.hasAce) {
-            return computeHardValue();
+    private int computeSoftValue() throws Exception {
+        if (!this.isSoft) {
+            throw new Exception("Hand has no soft value");
         }
-        return computeHardValue() + 10;
+        return this.computeHardValue() + 10;
     }
 
     /**
@@ -110,6 +126,15 @@ public class Hand {
         }
         return false;
     }
+
+    /**
+     * Determines whether a player's hand has a soft value or not.
+     * @return a boolean indicating whether a player's hand has a soft value or not.
+     */
+    private boolean determineSoft() {
+        return this.hasAce && (this.hardValue < 12);
+    }
+
 
     /**
      * Determines whether a player's hand is a pair or not.
