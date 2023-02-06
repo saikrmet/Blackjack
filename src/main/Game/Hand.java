@@ -14,10 +14,7 @@ public class Hand {
      * The cards in the player's hand.
      */
     private List<Card> cards;
-    /**
-     * A boolean indicating whether or not the player has an ace.
-     */
-    private boolean hasAce;
+
     /**
      * A boolean indicating whether or not the player has a soft value.
      */
@@ -34,7 +31,6 @@ public class Hand {
     public Hand(List<Card> cards) {
         this.cards = cards;
         this.hardValue = this.computeHardValue();
-        this.hasAce = this.determineAce();
         this.isSoft = this.determineSoft();
     }
 
@@ -64,12 +60,6 @@ public class Hand {
      * @return the size of the hand.
      */
     public Integer getSize() { return this.cards.size();}
-
-    /**
-     * Returns a boolean indicating whether this hand has an ace.
-     * @return a boolean indicating whether this hand has an ace.
-     */
-    public boolean getHasAce() {return this.hasAce;}
 
 //    /**
 //     * Naive strategy that determines whether the player hits or not.
@@ -132,7 +122,7 @@ public class Hand {
      * @return a boolean indicating whether a player's hand has a soft value or not.
      */
     private boolean determineSoft() {
-        return this.hasAce && (this.hardValue < 12);
+        return this.determineAce() && (this.hardValue < 12);
     }
 
 
@@ -148,6 +138,9 @@ public class Hand {
         }
     }
 
+    public boolean isSoft() {
+        return this.isSoft;
+    }
 
     /**
      * Returns the string representation of the card.

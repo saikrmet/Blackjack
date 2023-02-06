@@ -117,6 +117,7 @@ public final class Card {
      */
     private static ImmutableMap<Rank, Integer> initializeRankValueMap() {
         Map<Rank, Integer> rankMap = new HashMap<>();
+
         int rankVal = 0;
         for (Rank rank : Rank.values()) {
             if (rankVal < 10) {
