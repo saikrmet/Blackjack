@@ -189,7 +189,7 @@ public class StrategyParser {
 
         Map<Card.Rank, Map<Card.Rank, Strategy.Decision>> tempPairsMap = new HashMap<>();
         for (List<String> pairPos : mePos) {
-            Card.Rank pairedCard = strategyRankMap.get(pairPos.get(0).substring(0,pairPos.indexOf("+")));
+            Card.Rank pairedCard = strategyRankMap.get(pairPos.get(0).substring(0,pairPos.get(0).indexOf("+")));
             Map<Card.Rank, Strategy.Decision> dealerToDecision = new HashMap<>();
             for (int i = 1; i < dealerPos.size(); i++) {
                 Strategy.Decision decision = decisionMap.get(pairPos.get(i));
@@ -209,7 +209,7 @@ public class StrategyParser {
      */
     private ImmutableMap<Integer, Map<Card.Rank, List<Strategy.Decision>>> initSoftMap() throws
             IOException, CsvValidationException {
-        String filePath = "src/test/CSVFiles/Strategies/Wiki Strategy (Simplified) - pairs.csv";
+        String filePath = "src/test/CSVFiles/Strategies/Wiki Strategy (Simplified) - soft.csv";
         List<String[]> possibilities = this.readFile(filePath);
         List<String> dealerPos = Arrays.stream(possibilities.get(0)).toList();
         List<List<String>> mePos = new ArrayList<>();
@@ -245,7 +245,7 @@ public class StrategyParser {
      */
     private ImmutableMap<Integer, Map<Card.Rank, List<Strategy.Decision>>> initHardMap() throws IOException,
             CsvValidationException {
-        String filePath = "src/test/CSVFiles/Strategies/Wiki Strategy (Simplified) - pairs.csv";
+        String filePath = "src/test/CSVFiles/Strategies/Wiki Strategy (Simplified) - hard.csv";
         List<String[]> possibilities = this.readFile(filePath);
         List<String> dealerPos = Arrays.stream(possibilities.get(0)).toList();
         List<List<String>> mePos = new ArrayList<>();
