@@ -35,11 +35,12 @@ public class Strategy {
         List<Card.Rank> hardHand = List.of(Card.Rank.JACK, Card.Rank.QUEEN, Card.Rank.KING);
         if (myHand.isPair()) {
             if (hardHand.contains(myHand.getCards().get(0).getRank())) {
-                return this.hardStrat(strategyParser);
+                return Objects.requireNonNull(strategyParser.getPairsMap().get(Card.Rank.TEN))
+                        .get(dealer.getHand().getCards().get(0).getRank());
             } else {
                 return this.pairStrat(strategyParser);
             }
-        } else if (me.getHand().getHasAce()){
+        } else if (me.getHand().isSoft()){
             return this.softStrat(strategyParser);
         } else {
             return this.hardStrat(strategyParser);
@@ -53,18 +54,24 @@ public class Strategy {
     }
 
     private Decision softStrat(StrategyParser strategyParser) throws Exception {
-        int decisionInd = (me.getHand().getSize() == 2) ? (0) : (1);
+        List<Decision> decisions = Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(
+                strategyParser.getSoftMap().get(me.getHand().getSoftValue()))
+                .get(dealer.getHand().getCards().get(0).getRank())));
 
-        return Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(strategyParser.getSoftMap()
-                        .get(me.getHand().getSoftValue()))
-                .get(dealer.getHand().getCards().get(0).getRank())).get(decisionInd));
+        if (decisions.size() == 2 && me.getHand().getSize() != 2) {
+            return decisions.get(1);
+        }
+        return decisions.get(0);
     }
 
     private Decision hardStrat(StrategyParser strategyParser) throws IOException, CsvValidationException {
-        int decisionInd = (me.getHand().getSize() == 2) ? (0) : (1);
+        List<Decision> decisions = Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(
+                strategyParser.getHardMap().get(me.getHand().getHardValue()))
+                .get(dealer.getHand().getCards().get(0).getRank())));
 
-        return Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(strategyParser.getHardMap()
-                        .get(me.getHand().getHardValue()))
-                .get(dealer.getHand().getCards().get(0).getRank())).get(decisionInd));
+        if (decisions.size() == 2 && me.getHand().getSize() != 2) {
+            return decisions.get(1);
+        }
+        return decisions.get(0);
     }
 }
