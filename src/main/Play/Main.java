@@ -18,7 +18,8 @@ public class Main {
     public static void playGame(String[] args) throws Exception {
         String filePath = args[0];
         Parser parser = new Parser();
+        StrategyParser strategyParser = new StrategyParser();
         parser.readFile(filePath);
-        parser.play();
+        parser.play(strategyParser);
     }
 }
