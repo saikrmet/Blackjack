@@ -17,7 +17,7 @@ public class Player {
      * Constructor for a player.
      * @param cards the hand of the player.
      */
-    public Player(Set<Card> cards) {
+    public Player(List<Card> cards) {
         this.hand = new Hand(cards);
     }
 
