@@ -45,7 +45,55 @@ class MainTest {
             ,1f0d5,1f0c8,1f0bd,1f0b7,1f0bb,,,1f0a2,1f0c6
             ==> Dealer_hand={5♣},  My_hand ={2♠, 6♦},  Other_players_hands=[{8♦, Q♥}, {7♥, J♥}]
             ,1f0ca,1f0c7,1f0bb,1f0b4,1f0dd,1f0c3,1f0db,1f0b2,1f0a9
-            ==> Dealer_hand={10♦},  My_hand ={2♥, 9♠},  Other_players_hands=[{7♦, J♥}, {4♥, Q♣}, {3♦, J♣}]"""
+            ==> Dealer_hand={10♦},  My_hand ={2♥, 9♠},  Other_players_hands=[{7♦, J♥}, {4♥, Q♣}, {3♦, J♣}]""",
+
+            """
+            ,1f0ae,1f0da,1f0cd,1f0b2,1f0a7,,,1f0cb,1f0db
+            ==> Dealer_hand={K♠},  My_hand ={J♢, J♣},  Other_players_hands=[{10♣, Q♢}, {2♡, 7♠}]
+            ,1f0ab,,,,,,,1f0a6,1f0d6
+            ==> Dealer_hand={J♠},  My_hand ={6♠, 6♣},  Other_players_hands=[]
+            ,1f0ae,1f0da,1f0cd,1f0b2,1f0a7,,,1f0ce,1f0de
+            ==> Dealer_hand={K♠},  My_hand ={K♢, K♣},  Other_players_hands=[{10♣, Q♢}, {2♡, 7♠}]
+            ,1f0a5,,,,,,,1f0a6,1f0d6
+            ==> Dealer_hand={5♠},  My_hand ={6♠, 6♣},  Other_players_hands=[]
+            ,1f0cd,1f0b8,1f0bd,1f0d8,1f0aa,1f0d4,1f0a8,1f0a3,1f0c3,1f0ba
+            ==> Dealer_hand={Q♢},  My_hand ={3♠, 3♢, 10♡},  Other_players_hands=[{8♡, Q♡}, {8♣, 10♠}, {4♣, 8♠}]
+            ,1f0d2,1f0b5,1f0da,,,,,1f0b1,1f0a8,1f0d8
+            ==> Dealer_hand={2♣},  My_hand ={A♡, 8♠, 8♣},  Other_players_hands=[{5♡, 10♣}]
+            ,1f0cb,,,,,,,1f0a1,1f0db
+            ==> Dealer_hand={J♢},  My_hand ={A♠, J♣},  Other_players_hands=[]
+            ,1f0be,1f0db,1f0ce,,,,,1f0a1,1f0c7
+            ==> Dealer_hand={K♡},  My_hand ={A♠, 7♢},  Other_players_hands=[{J♣, K♢}]
+            ,1f0b3,1f0db,1f0ce,,,,,1f0a1,1f0c7
+            ==> Dealer_hand={3♡},  My_hand ={A♠, 7♢},  Other_players_hands=[{J♣, K♢}]
+            ,1f0d1,,,,,,,1f0a1,1f0a5
+            ==> Dealer_hand={A♣},  My_hand ={A♠, 5♠},  Other_players_hands=[]
+            ,1f0aa,1f0c1,1f0a7,1f0a2,1f0a4,1f0b1,1f0c2,1f0a1,1f0a8,1f0bd
+            ==> Dealer_hand={10♠},  My_hand ={A♠, 8♠, Q♡},  Other_players_hands=[{A♢, 7♠}, {2♠, 4♠}, {A♡, 2♢}]
+            ,1f0bb,1f0b1,1f0c8,1f0d5,1f0a9,1f0b2,1f0b9,1f0a1,1f0d1
+            ==> Dealer_hand={J♡},  My_hand ={A♠, A♣},  Other_players_hands=[{A♡, 8♢}, {5♣, 9♠}, {2♡, 9♡}]
+            ,1f0a6,,,,,,,1f0a5,1f0d5
+            ==> Dealer_hand={6♠},  My_hand ={5♠, 5♣},  Other_players_hands=[]
+            ,1f0a1,1f0b1,1f0c8,1f0d5,1f0a9,1f0b2,1f0b9,1f0a8,1f0d8
+            ==> Dealer_hand={A♠},  My_hand ={8♠, 8♣},  Other_players_hands=[{A♡, 8♢}, {5♣, 9♠}, {2♡, 9♡}]
+            ,1f0c9,1f0cb,1f0ad,,,,,1f0d2,1f0b5
+            ==> Dealer_hand={9♢},  My_hand ={2♣, 5♡},  Other_players_hands=[{J♢, Q♠}]
+            ,1f0d1,,,,,,,1f0d6,1f0c9
+            ==> Dealer_hand={A♣},  My_hand ={6♣, 9♢},  Other_players_hands=[]
+            ,1f0be,,,,,,,1f0a2,1f0b2,1f0c2,1f0bd
+            ==> Dealer_hand={K♡},  My_hand ={2♠, 2♡, 2♢, Q♡},  Other_players_hands=[]
+            ,1f0d9,1f0c8,1f0da,1f0c4,1f0b7,,,1f0c2,1f0a3,1f0b3,1f0c3
+            ==> Dealer_hand={9♣},  My_hand ={2♢, 3♠, 3♡, 3♢},  Other_players_hands=[{8♢, 10♣}, {4♢, 7♡}]
+            ,1f0a6,,,,,,,1f0c1,1f0b3,1f0a4
+            ==> Dealer_hand={6♠},  My_hand ={A♢, 3♡, 4♠},  Other_players_hands=[]
+            ,1f0b6,1f0d3,1f0a9,1f0c6,1f0b9,,,1f0c1,1f0c2
+            ==> Dealer_hand={6♡},  My_hand ={A♢, 2♢},  Other_players_hands=[{3♣, 9♠}, {6♢, 9♡}]
+            ,1f0a6,1f0c3,1f0c9,1f0c8,1f0bd,,,1f0c1,1f0ca
+            ==> Dealer_hand={6♠},  My_hand ={A♢, 10♢},  Other_players_hands=[{3♢, 9♢}, {8♢, Q♡}]
+            ,1f0d2,1f0ab,1f0de,,,,,1f0a2,1f0d4,1f0b5
+            ==> Dealer_hand={2♣},  My_hand ={2♠, 4♣, 5♡},  Other_players_hands=[{J♠, K♣}]
+            ,1f0ba,1f0c7,1f0a9,1f0c4,1f0a7,1f0d3,1f0de,1f0b5,1f0b8,1f0c3
+            ==> Dealer_hand={10♡},  My_hand ={5♡, 8♡, 3♢},  Other_players_hands=[{7♢, 9♠}, {4♢, 7♠}, {3♣, K♣}]"""
             };
 
     private static final String[] expectedContentsArray
@@ -76,13 +124,61 @@ class MainTest {
             HIT,1f0d5,1f0c8,1f0bd,1f0b7,1f0bb,,,1f0a2,1f0c6
             ==> Dealer_hand={5♣},  My_hand ={2♠, 6♦},  Other_players_hands=[{8♦, Q♥}, {7♥, J♥}]
             HIT,1f0ca,1f0c7,1f0bb,1f0b4,1f0dd,1f0c3,1f0db,1f0b2,1f0a9
-            ==> Dealer_hand={10♦},  My_hand ={2♥, 9♠},  Other_players_hands=[{7♦, J♥}, {4♥, Q♣}, {3♦, J♣}]"""
+            ==> Dealer_hand={10♦},  My_hand ={2♥, 9♠},  Other_players_hands=[{7♦, J♥}, {4♥, Q♣}, {3♦, J♣}]""",
+
+            """
+            STAY,1f0ae,1f0da,1f0cd,1f0b2,1f0a7,,,1f0cb,1f0db
+            ==> Dealer_hand={K♠},  My_hand ={J♢, J♣},  Other_players_hands=[{10♣, Q♢}, {2♡, 7♠}]
+            HIT,1f0ab,,,,,,,1f0a6,1f0d6
+            ==> Dealer_hand={J♠},  My_hand ={6♠, 6♣},  Other_players_hands=[]
+            STAY,1f0ae,1f0da,1f0cd,1f0b2,1f0a7,,,1f0ce,1f0de
+            ==> Dealer_hand={K♠},  My_hand ={K♢, K♣},  Other_players_hands=[{10♣, Q♢}, {2♡, 7♠}]
+            SPLIT,1f0a5,,,,,,,1f0a6,1f0d6
+            ==> Dealer_hand={5♠},  My_hand ={6♠, 6♣},  Other_players_hands=[]
+            HIT,1f0cd,1f0b8,1f0bd,1f0d8,1f0aa,1f0d4,1f0a8,1f0a3,1f0c3,1f0ba
+            ==> Dealer_hand={Q♢},  My_hand ={3♠, 3♢, 10♡},  Other_players_hands=[{8♡, Q♡}, {8♣, 10♠}, {4♣, 8♠}]
+            STAY,1f0d2,1f0b5,1f0da,,,,,1f0b1,1f0a8,1f0d8
+            ==> Dealer_hand={2♣},  My_hand ={A♡, 8♠, 8♣},  Other_players_hands=[{5♡, 10♣}]
+            STAY,1f0cb,,,,,,,1f0a1,1f0db
+            ==> Dealer_hand={J♢},  My_hand ={A♠, J♣},  Other_players_hands=[]
+            HIT,1f0be,1f0db,1f0ce,,,,,1f0a1,1f0c7
+            ==> Dealer_hand={K♡},  My_hand ={A♠, 7♢},  Other_players_hands=[{J♣, K♢}]
+            DOUBLE,1f0b3,1f0db,1f0ce,,,,,1f0a1,1f0c7
+            ==> Dealer_hand={3♡},  My_hand ={A♠, 7♢},  Other_players_hands=[{J♣, K♢}]
+            HIT,1f0d1,,,,,,,1f0a1,1f0a5
+            ==> Dealer_hand={A♣},  My_hand ={A♠, 5♠},  Other_players_hands=[]
+            STAY,1f0aa,1f0c1,1f0a7,1f0a2,1f0a4,1f0b1,1f0c2,1f0a1,1f0a8,1f0bd
+            ==> Dealer_hand={10♠},  My_hand ={A♠, 8♠, Q♡},  Other_players_hands=[{A♢, 7♠}, {2♠, 4♠}, {A♡, 2♢}]
+            SPLIT,1f0bb,1f0b1,1f0c8,1f0d5,1f0a9,1f0b2,1f0b9,1f0a1,1f0d1
+            ==> Dealer_hand={J♡},  My_hand ={A♠, A♣},  Other_players_hands=[{A♡, 8♢}, {5♣, 9♠}, {2♡, 9♡}]
+            DOUBLE,1f0a6,,,,,,,1f0a5,1f0d5
+            ==> Dealer_hand={6♠},  My_hand ={5♠, 5♣},  Other_players_hands=[]
+            SURRENDER,1f0a1,1f0b1,1f0c8,1f0d5,1f0a9,1f0b2,1f0b9,1f0a8,1f0d8
+            ==> Dealer_hand={A♠},  My_hand ={8♠, 8♣},  Other_players_hands=[{A♡, 8♢}, {5♣, 9♠}, {2♡, 9♡}]
+            HIT,1f0c9,1f0cb,1f0ad,,,,,1f0d2,1f0b5
+            ==> Dealer_hand={9♢},  My_hand ={2♣, 5♡},  Other_players_hands=[{J♢, Q♠}]
+            SURRENDER,1f0d1,,,,,,,1f0d6,1f0c9
+            ==> Dealer_hand={A♣},  My_hand ={6♣, 9♢},  Other_players_hands=[]
+            HIT,1f0be,,,,,,,1f0a2,1f0b2,1f0c2,1f0bd
+            ==> Dealer_hand={K♡},  My_hand ={2♠, 2♡, 2♢, Q♡},  Other_players_hands=[]
+            HIT,1f0d9,1f0c8,1f0da,1f0c4,1f0b7,,,1f0c2,1f0a3,1f0b3,1f0c3
+            ==> Dealer_hand={9♣},  My_hand ={2♢, 3♠, 3♡, 3♢},  Other_players_hands=[{8♢, 10♣}, {4♢, 7♡}]
+            STAY,1f0a6,,,,,,,1f0c1,1f0b3,1f0a4
+            ==> Dealer_hand={6♠},  My_hand ={A♢, 3♡, 4♠},  Other_players_hands=[]
+            DOUBLE,1f0b6,1f0d3,1f0a9,1f0c6,1f0b9,,,1f0c1,1f0c2
+            ==> Dealer_hand={6♡},  My_hand ={A♢, 2♢},  Other_players_hands=[{3♣, 9♠}, {6♢, 9♡}]
+            STAY,1f0a6,1f0c3,1f0c9,1f0c8,1f0bd,,,1f0c1,1f0ca
+            ==> Dealer_hand={6♠},  My_hand ={A♢, 10♢},  Other_players_hands=[{3♢, 9♢}, {8♢, Q♡}]
+            HIT,1f0d2,1f0ab,1f0de,,,,,1f0a2,1f0d4,1f0b5
+            ==> Dealer_hand={2♣},  My_hand ={2♠, 4♣, 5♡},  Other_players_hands=[{J♠, K♣}]
+            HIT,1f0ba,1f0c7,1f0a9,1f0c4,1f0a7,1f0d3,1f0de,1f0b5,1f0b8,1f0c3
+            ==> Dealer_hand={10♡},  My_hand ={5♡, 8♡, 3♢},  Other_players_hands=[{7♢, 9♠}, {4♢, 7♠}, {3♣, K♣}]"""
             };
 
 
     @AfterAll
     static void cleanUp() throws IOException {
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 4; i++) {
             writeFileContents(i);
         }
     }
@@ -112,6 +208,15 @@ class MainTest {
         Main.playGame(new String[]{"src/test/CSVFiles/tests/f2.csv"});
         String filePath = userDir + "/src/test/CSVFiles/tests/f2.csv";
         String expectedContents = expectedContentsArray[2];
+        String fileContents = Files.readString(Paths.get(filePath));
+        assertEquals(expectedContents, fileContents);
+    }
+
+    @Test
+    void testCSV3() throws Exception {
+        Main.playGame(new String[]{"src/test/CSVFiles/tests/f3.csv"});
+        String filePath = userDir + "/src/test/CSVFiles/tests/f3-SOLVED.csv";
+        String expectedContents = expectedContentsArray[3];
         String fileContents = Files.readString(Paths.get(filePath));
         assertEquals(expectedContents, fileContents);
     }
