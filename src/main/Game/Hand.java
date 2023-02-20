@@ -24,6 +24,12 @@ public class Hand {
      */
     private int hardValue;
 
+    private boolean isSurrendered;
+
+    private boolean isDoubled;
+
+    private boolean isFinal;
+
     /**
      * Constructor for a hand.
      * @param cards the cards in the player's hand.
@@ -80,6 +86,14 @@ public class Hand {
     public void addCard(Card card) {
         this.cards.add(card);
     }
+
+//    public Card removeCard() {
+//        if (this.cards.size() > 0) {
+//            Card removedCard = this.cards.get(0);
+//            this.cards.remove(0);
+//            return removedCard;
+//        }
+//    }
 
     /**
      * Computes the hard value of the hand based on the cards.
@@ -153,6 +167,42 @@ public class Hand {
             sb.append(card.toString()).append(" + ");
         }
         return sb.substring(0, sb.length() - 3);
+    }
+
+
+    public boolean isBust() {
+        return this.getHardValue() <= 21;
+    }
+
+    public boolean getSurrender() {
+        return this.isSurrendered;
+    }
+
+    public void setSurrender(boolean surrenderStatus) {
+        this.isSurrendered = surrenderStatus;
+    }
+
+    public boolean getDoubled() {
+        return this.isDoubled;
+    }
+
+    public void setDoubled(boolean doubledStatus) {
+        this.isDoubled = doubledStatus;
+    }
+
+    public boolean isBlackJack() throws Exception{
+        if (this.isSoft) {
+            return (this.getSoftValue() == 21 && this.cards.size() == 2);
+        }
+        return false;
+    }
+
+    public boolean getFinal() {
+        return this.isFinal;
+    }
+
+    public void setFinal(boolean finalStatus) {
+        this.isFinal = finalStatus;
     }
 
 }
