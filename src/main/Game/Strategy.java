@@ -1,6 +1,9 @@
 package main.Game;
 import com.google.common.base.Preconditions;
 import com.opencsv.exceptions.CsvValidationException;
+import main.Game.Card;
+import main.Game.Hand;
+import main.Game.Player;
 import main.Play.StrategyParser;
 
 import java.io.IOException;
@@ -21,34 +24,191 @@ public class Strategy {
 
     private final Player me;
 
+    private final int stratNum;
 
-    public Strategy(List<Player> players) {
+    private final StrategyParser strategyParser;
+
+    private Deck deck;
+
+
+    public Strategy(List<Player> players, int stratNum, StrategyParser strategyParser, Deck deck) {
         Preconditions.checkNotNull(players);
 
         this.dealer = players.get(0);
         this.me = players.get(1);
+        this.stratNum = stratNum;
+        this.strategyParser = strategyParser;
+        this.deck = deck;
+
     }
 
+    //    /**
+//     * Naive strategy that determines whether the player hits or not.
+//     * @return a boolean indicating whether the player hits or not.
+//     */
+//    public boolean playHit() throws Exception {
+//        if (this.isSoft) {
+//            return this.computeSoftValue() <= 17;
+//        } else {
+//            return !(this.computeHardValue() > 11);
+//        }
+//    }
 
-    public Decision makeDecision(StrategyParser strategyParser) throws Exception {
-        Hand myHand = me.getHand();
-        List<Card.Rank> hardHand = List.of(Card.Rank.JACK, Card.Rank.QUEEN, Card.Rank.KING);
-        if (myHand.isPair()) {
-            if (hardHand.contains(myHand.getCards().get(0).getRank())) {
-                return Objects.requireNonNull(strategyParser.getPairsMap().get(Card.Rank.TEN))
-                        .get(dealer.getHand().getCards().get(0).getRank());
-            } else {
-                return this.pairStrat(strategyParser);
+
+    public Float getPayoff() throws Exception {
+        List<Hand> myHands = doSplit(this.me.getHand());
+        this.me.setHands(myHands);
+
+        //Keep playing until all hands of me are final
+        for (Hand hand : me.getHands()) {
+            while (!hand.getFinal()) {
+                Decision decision = this.makeDecision(hand);
+                switch (decision) {
+                    case HIT -> {
+                        Card drawnCard = this.deck.getRandomCard();
+                        hand.addCard(drawnCard);
+                        this.deck.removeCard(drawnCard);
+                    }
+                    case STAY -> hand.setFinal(true);
+                    case SURRENDER -> {
+                        hand.setFinal(true);
+                        hand.setSurrender(true);
+                    }
+                    case DOUBLE -> {
+                        Card drawnCard = this.deck.getRandomCard();
+                        hand.addCard(drawnCard);
+                        this.deck.removeCard(drawnCard);
+                        hand.setFinal(true);
+                        hand.setDoubled(true);
+                    }
+                }
+                if (hand.isBust()) {
+                    hand.setFinal(true);
+                }
             }
-        } else if (me.getHand().isSoft()){
-            return this.softStrat(strategyParser);
+        }
+        while (!this.dealer.getHand().getFinal()) {
+            Decision decision = this.makeDecisionHW1(dealer.getHand());
+            switch (decision) {
+                case HIT -> {
+                    Card drawnCard = this.deck.getRandomCard();
+                    dealer.getHand().addCard(drawnCard);
+                    this.deck.removeCard(drawnCard);
+                }
+                case STAY -> dealer.getHand().setFinal(true);
+            }
+            if (dealer.getHand().isBust()) {
+                dealer.getHand().setFinal(true);
+            }
+        }
+        return calculatePayoff();
+    }
+
+    private List<Hand> doSplit(Hand hand) throws Exception {
+        List<Hand> retVal = new ArrayList<>();
+        if (this.makeDecision(hand) == Decision.SPLIT) {
+            List<Card> hand1 = new ArrayList<>();
+            List<Card> hand2 = new ArrayList<>();
+            hand1.add(hand.getCards().get(0));
+            hand2.add(hand.getCards().get(1));
+            Card drawnCard1 = this.deck.getRandomCard();
+            hand1.add(drawnCard1);
+            this.deck.removeCard(drawnCard1);
+            Card drawnCard2 = this.deck.getRandomCard();
+            hand2.add(drawnCard2);
+            this.deck.removeCard(drawnCard2);
+            retVal.addAll(doSplit(new Hand(hand1)));
+            retVal.addAll(doSplit(new Hand(hand2)));
         } else {
-            return this.hardStrat(strategyParser);
+            retVal.add(hand);
+        }
+        return retVal;
+    }
+
+    private Decision makeDecision(Hand hand) throws Exception {
+        if (this.stratNum == 1) {
+            return this.makeDecisionHW1(hand);
+        } else if (this.stratNum == 2) {
+            return this.makeDecisionHW2(hand);
+        } else {
+            throw new Exception("Not a valid HW strategy number");
+        }
+    }
+
+    private Decision makeDecisionHW1(Hand hand) throws Exception {
+        if (hand.isSoft() && hand.getSoftValue() <= 17) {
+            return Decision.HIT;
+        } else {
+            return Decision.STAY;
         }
     }
 
 
-    private Decision pairStrat(StrategyParser strategyParser) throws IOException, CsvValidationException {
+    private Decision makeDecisionHW2(Hand hand) throws Exception {
+        List<Card.Rank> hardHand = List.of(Card.Rank.JACK, Card.Rank.QUEEN, Card.Rank.KING);
+        if (hand.isPair()) {
+            if (hardHand.contains(hand.getCards().get(0).getRank())) {
+                return Objects.requireNonNull(this.strategyParser.getPairsMap().get(Card.Rank.TEN))
+                        .get(dealer.getHand().getCards().get(0).getRank());
+            } else {
+                return this.pairStrat(this.strategyParser);
+            }
+        } else if (hand.isSoft()){
+            return this.softStrat(this.strategyParser);
+        } else {
+            return this.hardStrat(this.strategyParser);
+        }
+    }
+
+    private Float calculatePayoff() throws Exception {
+        float myPayoff = 0f;
+        for (Hand myHand : this.me.getHands()) {
+            int factor = 1;
+            if (myHand.getDoubled()) {
+                factor = 2;
+            }
+            if (myHand.getSurrender()) {
+                myPayoff -= 0.50f;
+            } else {
+                if (myHand.isBust()) {
+                    myPayoff -= factor;
+                } else if (myHand.isBlackJack()) {
+                    if (this.dealer.getHand().isBlackJack()) {
+                        myPayoff += 0;
+                    } else {
+                        myPayoff += 1.5 * factor;
+                    }
+                } else if (this.dealer.getHand().isBlackJack()) {
+                    myPayoff -= 1.5 * factor;
+                } else {
+                    int myValue;
+                    int dealerValue;
+                    if (myHand.isSoft()) {
+                        myValue = myHand.getSoftValue();
+                    } else {
+                        myValue = myHand.getHardValue();
+                    }
+                    if (this.dealer.getHand().isSoft()) {
+                        dealerValue = this.dealer.getHand().getSoftValue();
+                    } else {
+                        dealerValue = this.dealer.getHand().getHardValue();
+                    }
+                    if (myValue > dealerValue) {
+                        myPayoff += factor;
+                    } else if (myValue == dealerValue) {
+                        myPayoff += 0;
+                    } else {
+                        myPayoff -= factor;
+                    }
+                }
+            }
+        }
+        return myPayoff;
+
+    }
+
+
+    private Decision pairStrat(StrategyParser strategyParser) throws Exception {
         return Objects.requireNonNull(strategyParser.getPairsMap().get(me.getHand().getCards().get(0).getRank()))
                 .get(dealer.getHand().getCards().get(0).getRank());
     }
@@ -64,7 +224,7 @@ public class Strategy {
         return decisions.get(0);
     }
 
-    private Decision hardStrat(StrategyParser strategyParser) throws IOException, CsvValidationException {
+    private Decision hardStrat(StrategyParser strategyParser) throws Exception {
         List<Decision> decisions = Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(
                 strategyParser.getHardMap().get(me.getHand().getHardValue()))
                 .get(dealer.getHand().getCards().get(0).getRank())));
@@ -74,4 +234,5 @@ public class Strategy {
         }
         return decisions.get(0);
     }
+
 }
