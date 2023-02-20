@@ -11,14 +11,16 @@ public class Player {
     /**
      * The hand of the player.
      */
-    private Hand hand;
+    private List<Hand> hands;
 
-    /**
-     * Constructor for a player.
-     * @param cards the hand of the player.
-     */
-    public Player(List<Card> cards) {
-        this.hand = new Hand(cards);
+
+    public Player(Hand hand) {
+        this.hands = new ArrayList<>();
+        this.hands.add(hand);
+    }
+
+    public void setHands(List<Hand> hands) {
+        this.hands = hands;
     }
 
     /**
