@@ -27,8 +27,22 @@ public class Player {
      * Returns the hand of the player.
      * @return the hand of the player.
      */
-    public Hand getHand() {
-        return this.hand;
+    public Hand getHand() throws Exception {
+        if (this.hands.size() == 1) {
+            return this.hands.get(0);
+        } else {
+            throw new Exception("Player has more than one hand");
+        }
     }
+
+    /**
+     * Returns the hands of the player.
+     * @return the hands of the player.
+     */
+    public List<Hand> getHands() {
+        return this.hands;
+    }
+
+
 
 }
