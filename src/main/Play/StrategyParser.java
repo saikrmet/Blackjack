@@ -7,13 +7,10 @@ import java.io.*;
 import java.io.IOException;
 import java.util.*;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.opencsv.*;
-import com.opencsv.exceptions.CsvBadConverterException;
 import com.opencsv.exceptions.CsvValidationException;
 import main.Game.Card.Rank;
-import main.Game.Card.Suit;
 import main.Game.Card;
 import main.Game.Strategy;
 
