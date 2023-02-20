@@ -38,6 +38,9 @@ public class Hand {
         this.cards = cards;
         this.hardValue = this.computeHardValue();
         this.isSoft = this.determineSoft();
+        this.isSurrendered = false;
+        this.isDoubled = false;
+        this.isFinal = false;
     }
 
     public List<Card> getCards() {
