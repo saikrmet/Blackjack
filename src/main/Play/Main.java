@@ -16,12 +16,18 @@ public class Main {
     }
 
     public static void playGame(String[] args) throws Exception {
-        String filePath = args[0];
-        Parser parser = new Parser();
-        StrategyParser strategyParser = new StrategyParser();
-        parser.readFile(filePath);
-        parser.play(strategyParser);
-        System.out.println("All operations successful. Results at " + filePath.substring(0, filePath.length() - 4)
-                + "-SOLVED.csv");
+//        String filePath = args[0];
+//        Parser parser = new Parser();
+//        StrategyParser strategyParser = new StrategyParser();
+//        parser.readFile(filePath);
+//        parser.play(strategyParser);
+//        System.out.println("All operations successful. Results at " + filePath.substring(0, filePath.length() - 4)
+//                + "-SOLVED.csv");
+
+        PlayGame playGameHW1 = new PlayGame(100000000, 1);
+        PlayGame playGameHW2 = new PlayGame(100000000, 2);
+        playGameHW1.printMetrics();
+        playGameHW2.printMetrics();
+
     }
 }
