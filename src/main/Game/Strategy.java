@@ -179,8 +179,8 @@ public class Strategy {
         }
     }
 
-    private Decision makeDecisionDealer(Hand hand) {
-        if (hand.isSoft() && hand.getHardValue() >= 17) {
+    private Decision makeDecisionDealer(Hand hand) throws Exception {
+        if (hand.isSoft() && hand.getSoftValue() >= 17) {
             return Decision.STAY;
         } else if (hand.getHardValue() > 17) {
             return Decision.STAY;
@@ -199,16 +199,18 @@ public class Strategy {
             if (myHand.isSurrender()) {
                 myPayoff -= 0.50f;
             } else {
-                if (myHand.isBust()) {
-                    myPayoff -= factor;
-                } else if (myHand.isBlackJack()) {
+                if (myHand.isBlackJack()) {
                     if (this.dealer.getHand().isBlackJack()) {
                         myPayoff += 0;
                     } else {
-                        myPayoff += 1.5 * factor;
+                        myPayoff += 1.5;
                     }
+                } else if (myHand.isBust()) {
+                    myPayoff -= factor;
                 } else if (this.dealer.getHand().isBlackJack()) {
-                    myPayoff -= 1.5 * factor;
+                    myPayoff -= 1;
+                } else if (this.dealer.getHand().isBust()) {
+                    myPayoff += factor;
                 } else {
                     int myValue;
                     int dealerValue;
