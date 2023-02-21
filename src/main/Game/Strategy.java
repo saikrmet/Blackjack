@@ -61,7 +61,7 @@ public class Strategy {
 
         //Keep playing until all hands of me are final
         for (Hand hand : me.getHands()) {
-            while (!hand.getFinal()) {
+            while (!hand.isFinal()) {
                 Decision decision = this.makeDecision(hand);
                 switch (decision) {
                     case HIT -> {
@@ -87,8 +87,8 @@ public class Strategy {
                 }
             }
         }
-        while (!this.dealer.getHand().getFinal()) {
-            Decision decision = this.makeDecisionHW1(dealer.getHand());
+        while (!this.dealer.getHand().isFinal()) {
+            Decision decision = this.makeDecisionDealer(dealer.getHand());
             switch (decision) {
                 case HIT -> {
                     Card drawnCard = this.deck.getRandomCard();
@@ -149,14 +149,24 @@ public class Strategy {
         if (hand.isPair()) {
             if (hardHand.contains(hand.getCards().get(0).getRank())) {
                 return Objects.requireNonNull(this.strategyParser.getPairsMap().get(Card.Rank.TEN))
-                        .get(dealer.getHand().getCards().get(0).getRank());
+                        .get(this.dealer.getHand().getCards().get(0).getRank());
             } else {
-                return this.pairStrat(this.strategyParser);
+                return this.pairStrat(this.strategyParser, hand);
             }
         } else if (hand.isSoft()){
-            return this.softStrat(this.strategyParser);
+            return this.softStrat(this.strategyParser, hand);
         } else {
-            return this.hardStrat(this.strategyParser);
+            return this.hardStrat(this.strategyParser, hand);
+        }
+    }
+
+    private Decision makeDecisionDealer(Hand hand) {
+        if (hand.isSoft() && hand.getHardValue() >= 17) {
+            return Decision.STAY;
+        } else if (hand.getHardValue() > 17) {
+            return Decision.STAY;
+        } else {
+            return Decision.HIT;
         }
     }
 
@@ -164,10 +174,10 @@ public class Strategy {
         float myPayoff = 0f;
         for (Hand myHand : this.me.getHands()) {
             int factor = 1;
-            if (myHand.getDoubled()) {
+            if (myHand.isDoubled()) {
                 factor = 2;
             }
-            if (myHand.getSurrender()) {
+            if (myHand.isSurrender()) {
                 myPayoff -= 0.50f;
             } else {
                 if (myHand.isBust()) {
@@ -208,28 +218,26 @@ public class Strategy {
     }
 
 
-    private Decision pairStrat(StrategyParser strategyParser) throws Exception {
-        return Objects.requireNonNull(strategyParser.getPairsMap().get(me.getHand().getCards().get(0).getRank()))
-                .get(dealer.getHand().getCards().get(0).getRank());
+    private Decision pairStrat(StrategyParser strategyParser, Hand hand) throws Exception {
+        return Objects.requireNonNull(strategyParser.getPairsMap().get(hand.getCards().get(0).getRank()))
+                .get(this.dealer.getHand().getCards().get(0).getRank());
     }
 
-    private Decision softStrat(StrategyParser strategyParser) throws Exception {
-        List<Decision> decisions = Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(
-                strategyParser.getSoftMap().get(me.getHand().getSoftValue()))
-                .get(dealer.getHand().getCards().get(0).getRank())));
+    private Decision softStrat(StrategyParser strategyParser, Hand hand) throws Exception {
+        List<Decision> decisions = Objects.requireNonNull(Objects.requireNonNull(strategyParser.getSoftMap().
+                get(hand.getSoftValue())).get(this.dealer.getHand().getCards().get(0).getRank()));
 
-        if (decisions.size() == 2 && me.getHand().getSize() != 2) {
+        if (decisions.size() == 2 && hand.getSize() != 2) {
             return decisions.get(1);
         }
         return decisions.get(0);
     }
 
-    private Decision hardStrat(StrategyParser strategyParser) throws Exception {
-        List<Decision> decisions = Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(
-                strategyParser.getHardMap().get(me.getHand().getHardValue()))
-                .get(dealer.getHand().getCards().get(0).getRank())));
+    private Decision hardStrat(StrategyParser strategyParser, Hand hand) throws Exception {
+        List<Decision> decisions = Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(strategyParser
+                .getHardMap().get(hand.getHardValue())).get(this.dealer.getHand().getCards().get(0).getRank())));
 
-        if (decisions.size() == 2 && me.getHand().getSize() != 2) {
+        if (decisions.size() == 2 && hand.getSize() != 2) {
             return decisions.get(1);
         }
         return decisions.get(0);
