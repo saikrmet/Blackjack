@@ -27,7 +27,10 @@ public class PlayGame {
 
 
     private List<Float> run() throws Exception {
-        List<Float> payoffOutcomes = new ArrayList<>();
+        //List<Float> payoffOutcomes = new ArrayList<>();
+        float totalPayoff = 0.0F;
+        float minPayoff = 0.0F;
+        Float maxPayoff = 0.0F;
         List<Player> initialGameState;
         Player me;
         Player dealer;
@@ -38,13 +41,24 @@ public class PlayGame {
             dealer = initialGameState.get(0);
             me = initialGameState.get(initialGameState.size() - 1);
             Strategy strategy = new Strategy(List.of(dealer, me), this.stratNum, strategyParser, this.deck);
-            payoffOutcomes.add(strategy.getPayoff());
+            Float retPayoff = strategy.getPayoff();
+            if (retPayoff > maxPayoff) {
+                maxPayoff = retPayoff;
+            }
+            if (retPayoff < minPayoff) {
+                minPayoff = retPayoff;
+            }
+            totalPayoff += retPayoff;
+            //payoffOutcomes.add(strategy.getPayoff());
         }
 
         List<Float> returnOutcomes = new ArrayList<>();
-        returnOutcomes.add(payoffOutcomes.stream().reduce(0.0F, Float::sum) / this.numGames);
-        returnOutcomes.add(Collections.max(payoffOutcomes));
-        returnOutcomes.add(Collections.min(payoffOutcomes));
+        returnOutcomes.add(totalPayoff / this.numGames);
+        returnOutcomes.add(maxPayoff);
+        returnOutcomes.add(minPayoff);
+//        returnOutcomes.add(payoffOutcomes.stream().reduce(0.0F, Float::sum) / this.numGames);
+//        returnOutcomes.add(Collections.max(payoffOutcomes));
+//        returnOutcomes.add(Collections.min(payoffOutcomes));
 
         return returnOutcomes;
     }
