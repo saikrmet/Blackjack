@@ -20,9 +20,9 @@ public class PlayGame {
 
     public void printMetrics() throws Exception {
         List<Float> metrics = this.run();
-        System.out.printf("HW%d Avg: %.3f", this.numGames, metrics.get(0));
-        System.out.printf("HW%d Max Gain: %.3f", this.numGames, metrics.get(1));
-        System.out.printf("HW%d Max Loss: %.3f", this.numGames, metrics.get(2));
+        System.out.printf("HW%d Avg: %.3f\n", this.stratNum, metrics.get(0));
+        System.out.printf("HW%d Max Gain: %.3f\n", this.stratNum, metrics.get(1));
+        System.out.printf("HW%d Max Loss: %.3f\n", this.stratNum, metrics.get(2));
     }
 
 
@@ -56,7 +56,9 @@ public class PlayGame {
 
         Card dealerCard = deck.getRandomCard();
         deck.removeCard(dealerCard);
-        players.add(new Player(new Hand(List.of(dealerCard))));
+        List<Card> dealerCards = new ArrayList<>();
+        dealerCards.add(dealerCard);
+        players.add(new Player(new Hand(dealerCards)));
 
         int numPlayers = getRandomNumPlayers();
 
