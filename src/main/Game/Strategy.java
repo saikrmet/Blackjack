@@ -136,11 +136,13 @@ public class Strategy {
     }
 
     private Decision makeDecisionHW1(Hand hand) throws Exception {
-        if (hand.isSoft() && hand.getSoftValue() <= 17) {
-            return Decision.HIT;
-        } else {
+        int hardVal = hand.getHardValue();
+        if (hardVal > 11) {
+            return Decision.STAY;
+        } else if (hand.isSoft() && hand.getSoftValue() > 17) {
             return Decision.STAY;
         }
+        return Decision.HIT;
     }
 
 
