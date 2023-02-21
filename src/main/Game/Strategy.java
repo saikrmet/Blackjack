@@ -58,6 +58,11 @@ public class Strategy {
     public Float getPayoff() throws Exception {
         List<Hand> myHands = doSplit(this.me.getHand());
         this.me.setHands(myHands);
+        //System.out.println("The dealer's hand is " + this.dealer.getHand());
+        //for (Hand hand : this.me.getHands()) {
+        //    System.out.println("The player's hand is " + hand);
+        //}
+
 
         //Keep playing until all hands of me are final
         for (Hand hand : me.getHands()) {
@@ -101,12 +106,24 @@ public class Strategy {
                 dealer.getHand().setFinal(true);
             }
         }
+        //System.out.println("The dealer's final hand is " + this.dealer.getHand());
+        //for (Hand hand : this.me.getHands()) {
+        //    System.out.println("The player's final hand is " + hand);
+        //    if (hand.isDoubled()) {
+        //        System.out.println("doubled");
+        //    }
+        //    if (hand.isSurrender()) {
+        //        System.out.println("surrendered");
+        //    }
+        //}
+        //System.out.println(calculatePayoff());
         return calculatePayoff();
     }
 
     private List<Hand> doSplit(Hand hand) throws Exception {
         List<Hand> retVal = new ArrayList<>();
         if (this.makeDecision(hand) == Decision.SPLIT) {
+            //System.out.println("splitishere");
             List<Card> hand1 = new ArrayList<>();
             List<Card> hand2 = new ArrayList<>();
             hand1.add(hand.getCards().get(0));
