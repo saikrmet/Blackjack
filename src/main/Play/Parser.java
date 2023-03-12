@@ -48,94 +48,114 @@ public class Parser {
         List<String> listOfGames = new ArrayList<>();
         String line;
         while ((line = reader.readLine()) != null){
+//            System.out.println(line);
             listOfGames.add(line);
         }
         reader.close();
         this.listOfGames = listOfGames;
     }
 
-//    /**
-//     * Makes decision whether to hit or stay for each game and writes it to the CSV file.
-//     * @param strategyParser the parser for the strategy containing relevant maps
-//     * @throws Exception if input is invalid
-//     */
-//    public void play(StrategyParser strategyParser) throws Exception {
-//        List<Card> cardsInGame;
-//        StringBuilder output = new StringBuilder();
-//
-//        //Makes decision whether to hit or stay for each game.
-//        int counter = 0; // skip all odd lines as per CSV guidelines
-//        for (String strGame : this.listOfGames) {
-//            counter ++;
-//
-//            if (counter % 2 == 0) {
-//                output.append(strGame).append("\n");
-//                continue;
-//            }
-//
-//            cardsInGame = this.generateGameState(strGame);
-//
-//            Player dealer = new Player(new ArrayList<>(Collections.singleton(cardsInGame.get(1))));
-//            Player me = new Player(new ArrayList<>(Preconditions.checkNotNull(
-//                    cardsInGame.subList(8, cardsInGame.size()))));
-//            Strategy strategy = new Strategy(List.of(dealer, me));
-//            output.append(strategy.makeDecision(strategyParser).toString() + strGame + "\n");
-//        }
-//        this.writeFile(output.toString());
-//    }
-//
-//
-//    /**
-//     * Takes the string representation of a game and changes it to an ArrayList of Cards.
-//     * @param strGame the string representation of a Blackjack game (array of strings representing
-//     * potential cards)
-//     * @return the ArrayList of Cards representing the current game state.
-//     * @throws Exception if the game is invalid (i.e. not enough cards).
-//     */
-//    private List<Card> generateGameState(String strGame) throws Exception {
-//        String[] cards = strGame.split(",");
-//
-//        if (cards.length < 10) {
-//            throw new Exception("Invalid CSV format");
-//        }
-//
-//        List<Card> cardsInGame = new ArrayList<>();
-//        //convert unicode representations to actual cards with ranks and suits.
-//        for (String card: cards) {
-//            card = card.strip();
-//            if (checkValidCard(card)) {
-//                Card.Suit cardSuit = suitMap.get(card.charAt(3));
-//                Card.Rank cardRank = rankMap.get(card.charAt(4));
-//                cardsInGame.add(new Card(cardRank, cardSuit));
-//            } else {
-//                cardsInGame.add(null); // add null to indicate no card present
-//            }
-//        }
-//        return cardsInGame;
-//    }
+    /**
+     * Makes decision whether to hit or stay for each game and writes it to the CSV file.
+     * @param strategyParser the parser for the strategy containing relevant maps
+     * @throws Exception if input is invalid
+     */
+    public void play(StrategyParser strategyParser) throws Exception {
+        List<Card> cardsInGame;
+        StringBuilder output = new StringBuilder();
 
-//    /**
-//     * Checks whether a card is valid or not.
-//     * @param card the string representation of a card.
-//     * @return a boolean indicating whether the unicode representation of a card is valid or not.
-//     */
-//    private boolean checkValidCard(String card) {
-//        //invalid unicode string
-//        return (card.length() == 5) && ((card.startsWith("1F0")) || card.startsWith("1f0")) &&
-//                (suitMap.containsKey(card.charAt(3))) && (rankMap.containsKey(card.charAt(4)));
-//    }
-//
-//    /**
-//     * Writes a string to a file.
-//     * @param contents the string to be written to the file.
-//     * @throws IOException if the file path is invalid.
-//     */
-//    private void writeFile(String contents) throws IOException {
-//        FileWriter writer = new FileWriter(this.filePath.substring(0, this.filePath.length() - 4)
-//                + "-SOLVED.csv");
-//        writer.write(contents.trim());
-//        writer.close();
-//    }
+        //Makes decision whether to hit or stay for each game.
+        int counter = 0; // skip all odd lines as per CSV guidelines
+        Random rand = new Random();
+        for (String strGame: this.listOfGames) {
+//            System.out.println(strGame);
+            counter ++;
+
+            if (counter % 2 == 0) {
+                output.append(strGame).append("\n");
+                continue;
+            }
+            // Making Deck
+            Deck gameDeck = new Deck();
+            gameDeck.setSeed(rand.nextLong());
+
+            // Giving players their cards
+            cardsInGame = this.generateGameState(strGame, gameDeck);
+//            new Hand(dealerCards)
+            List<Card> dealerHand =new ArrayList<>();
+            dealerHand.add(cardsInGame.get(2));
+            Player dealer = new Player(new Hand(dealerHand));
+            Player me = new Player(new Hand(Preconditions.checkNotNull(
+                    cardsInGame.subList(11, cardsInGame.size()))));
+
+            // Running both strategies
+            Strategy strategy1 = new Strategy(List.of(dealer, me), 1, strategyParser, gameDeck);
+            Strategy strategy2 = new Strategy(List.of(dealer, me), 2, strategyParser, new Deck(gameDeck));
+            Float retPayoff1 = strategy1.getPayoff();
+            Float retPayoff2 = strategy2.getPayoff();
+            output.append(retPayoff1.toString() + ',' + retPayoff2.toString() + strGame.substring(1) + "\n");
+        }
+        this.writeFile(output.toString());
+    }
+
+
+    /**
+     * Takes the string representation of a game and changes it to an ArrayList of Cards.
+     * @param strGame the string representation of a Blackjack game (array of strings representing
+     * potential cards)
+     * @return the ArrayList of Cards representing the current game state.
+     * @throws Exception if the game is invalid (i.e. not enough cards).
+     */
+    private List<Card> generateGameState(String strGame, Deck deck) throws Exception {
+        String[] cards = strGame.split(",");
+
+        if (cards.length != 13) {
+//            System.err.println(strGame);
+//            System.err.println(cards[0]);
+//            System.err.println(cards.length);
+            throw new Exception("Invalid CSV format");
+
+        }
+
+        List<Card> cardsInGame = new ArrayList<>();
+        //convert unicode representations to actual cards with ranks and suits.
+        for (String card: cards) {
+            card = card.strip();
+            if (checkValidCard(card)) {
+                Card.Suit cardSuit = suitMap.get(card.charAt(3));
+                Card.Rank cardRank = rankMap.get(card.charAt(4));
+                Card newCard = new Card(cardRank, cardSuit);
+                deck.removeCard(newCard);
+                cardsInGame.add(newCard);
+            } else {
+                cardsInGame.add(null); // add null to indicate no card present
+            }
+        }
+        return cardsInGame;
+    }
+
+    /**
+     * Checks whether a card is valid or not.
+     * @param card the string representation of a card.
+     * @return a boolean indicating whether the unicode representation of a card is valid or not.
+     */
+    private boolean checkValidCard(String card) {
+        //invalid unicode string
+        return (card.length() == 5) && ((card.startsWith("1F0")) || card.startsWith("1f0")) &&
+                (suitMap.containsKey(card.charAt(3))) && (rankMap.containsKey(card.charAt(4)));
+    }
+
+    /**
+     * Writes a string to a file.
+     * @param contents the string to be written to the file.
+     * @throws IOException if the file path is invalid.
+     */
+    private void writeFile(String contents) throws IOException {
+        FileWriter writer = new FileWriter(this.filePath.substring(0, this.filePath.length() - 4)
+                + "-SOLVED.csv");
+        writer.write(contents.trim());
+        writer.close();
+    }
 
     /**
      * Creates the immutable mapping of each unicode character to its rank.

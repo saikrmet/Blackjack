@@ -18,6 +18,19 @@ public class Deck {
         this.random = new Random();
     }
 
+    public Deck(Deck deck) {
+        this.deck = new ArrayList<>(deck.getDeck());
+        this.random = deck.getRandom();
+    }
+
+    private List<Card> getDeck() {
+        return this.deck;
+    }
+
+    private Random getRandom() {
+        return this.random;
+    }
+
 
     public void removeCard(Card card) throws Exception {
 
@@ -43,6 +56,10 @@ public class Deck {
     public Card getRandomCard() {
         int randomCard = this.random.nextInt(this.deck.size());
         return this.deck.get(randomCard);
+    }
+
+    public void setSeed(long seed) {
+        this.random.setSeed(seed);
     }
 
 }
