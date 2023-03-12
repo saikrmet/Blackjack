@@ -22,6 +22,12 @@ public class Parser {
      * A list of all the games played, in string form.
      */
     private List<String> listOfGames;
+
+    /**
+     * The number of games to run for each hand.
+     */
+    private Float numGames;
+
     /**
      * A mapping of each possible input letter in the unicode representation of a card
      * to the suit it represents.
@@ -60,16 +66,19 @@ public class Parser {
      * @param strategyParser the parser for the strategy containing relevant maps
      * @throws Exception if input is invalid
      */
-    public void play(StrategyParser strategyParser) throws Exception {
+    public void play(StrategyParser strategyParser, int numGames) throws Exception {
+        this.numGames = (float) numGames;
         List<Card> cardsInGame;
         StringBuilder output = new StringBuilder();
+
+        System.out.println("Playing...");
 
         //Makes decision whether to hit or stay for each game.
         int counter = 0; // skip all odd lines as per CSV guidelines
         Random rand = new Random();
         for (String strGame: this.listOfGames) {
 //            System.out.println(strGame);
-            counter ++;
+            counter++;
 
             if (counter % 2 == 0) {
                 output.append(strGame).append("\n");
@@ -79,21 +88,40 @@ public class Parser {
             Deck gameDeck = new Deck();
             gameDeck.setSeed(rand.nextLong());
 
-            // Giving players their cards
+            // Giving players their cards and removing cards in play from deck
             cardsInGame = this.generateGameState(strGame, gameDeck);
-//            new Hand(dealerCards)
-            List<Card> dealerHand =new ArrayList<>();
+
+            //Generate dealer's hand
+            List<Card> dealerHand = new ArrayList<>();
             dealerHand.add(cardsInGame.get(2));
             Player dealer = new Player(new Hand(dealerHand));
-            Player me = new Player(new Hand(Preconditions.checkNotNull(
-                    cardsInGame.subList(11, cardsInGame.size()))));
 
-            // Running both strategies
-            Strategy strategy1 = new Strategy(List.of(dealer, me), 1, strategyParser, gameDeck);
-            Strategy strategy2 = new Strategy(List.of(dealer, me), 2, strategyParser, new Deck(gameDeck));
-            Float retPayoff1 = strategy1.getPayoff();
-            Float retPayoff2 = strategy2.getPayoff();
-            output.append(retPayoff1.toString() + ',' + retPayoff2.toString() + strGame.substring(1) + "\n");
+            //Generate my hand
+            Player me = new Player(new Hand(Preconditions.checkNotNull(cardsInGame.subList(11, cardsInGame.size()))));
+
+            Float aggPayoff1 = 0.0F;
+            Float aggPayoff2 = 0.0F;
+
+            for (int i = 0; i < this.numGames; i++) {
+                // Running both strategies
+                Strategy strategy1 = new Strategy(List.of(dealer, me), 1, strategyParser, gameDeck);
+                Strategy strategy2 = new Strategy(List.of(dealer, me), 2, strategyParser, new Deck(gameDeck));
+                Float retPayoff1 = strategy1.getPayoff();
+                Float retPayoff2 = strategy2.getPayoff();
+                aggPayoff1 += retPayoff1;
+                aggPayoff2 += retPayoff2;
+
+            }
+            System.out.print(aggPayoff1 + "    ");
+            System.out.println(aggPayoff2);
+            aggPayoff1 /= this.numGames;
+            aggPayoff2 /= this.numGames;
+
+            String agg1Str = String.format("%.5f", aggPayoff1);
+            String agg2Str = String.format("%.5f", aggPayoff2);
+
+            output.append(agg1Str).append(',').append(agg2Str).append(strGame.substring(1)).append("\n");
+
         }
         this.writeFile(output.toString());
     }
@@ -113,6 +141,8 @@ public class Parser {
 //            System.err.println(strGame);
 //            System.err.println(cards[0]);
 //            System.err.println(cards.length);
+            System.out.println(cards.length);
+            System.out.println(Arrays.toString(cards));
             throw new Exception("Invalid CSV format");
 
         }
@@ -151,6 +181,9 @@ public class Parser {
      * @throws IOException if the file path is invalid.
      */
     private void writeFile(String contents) throws IOException {
+
+        System.out.println("Writing to output file...");
+
         FileWriter writer = new FileWriter(this.filePath.substring(0, this.filePath.length() - 4)
                 + "-SOLVED.csv");
         writer.write(contents.trim());

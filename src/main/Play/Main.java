@@ -33,7 +33,10 @@ public class Main {
         Parser parser = new Parser();
         parser.readFile(HW4_FILE);
         StrategyParser stratParser = new StrategyParser();
-        parser.play(stratParser);
+        System.out.println("Running Main...");
+        parser.play(stratParser, 1000000);
+        System.out.println("Done...");
+
 
     }
 }
