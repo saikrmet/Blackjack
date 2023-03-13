@@ -35,7 +35,11 @@ public class Hand {
      * @param cards the cards in the player's hand.
      */
     public Hand(List<Card> cards) {
-        this.cards = cards;
+        List<Card> newCards = new ArrayList<>();
+        for (var card: cards) {
+            newCards.add(new Card(card.getRank(), card.getSuit()));
+        }
+        this.cards = newCards;
         this.hardValue = this.computeHardValue();
         this.isSoft = this.determineSoft();
         this.isSurrendered = false;

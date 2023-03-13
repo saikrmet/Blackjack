@@ -77,16 +77,18 @@ public class Parser {
         int counter = 0; // skip all odd lines as per CSV guidelines
         Random rand = new Random();
         for (String strGame: this.listOfGames) {
-//            System.out.println(strGame);
+
             counter++;
 
             if (counter % 2 == 0) {
                 output.append(strGame).append("\n");
                 continue;
             }
+
+            System.out.println(strGame);
+
             // Making Deck
             Deck gameDeck = new Deck();
-            gameDeck.setSeed(rand.nextLong());
 
             // Giving players their cards and removing cards in play from deck
             cardsInGame = this.generateGameState(strGame, gameDeck);
@@ -103,14 +105,21 @@ public class Parser {
             Float aggPayoff2 = 0.0F;
 
             for (int i = 0; i < this.numGames; i++) {
+                gameDeck.setSeed(rand.nextLong());
                 // Running both strategies
-                Strategy strategy1 = new Strategy(List.of(dealer, me), 1, strategyParser, gameDeck);
-                Strategy strategy2 = new Strategy(List.of(dealer, me), 2, strategyParser, new Deck(gameDeck));
+                Player copyMe = new Player(new Hand(Preconditions.checkNotNull(cardsInGame.subList(11, cardsInGame.size()))));
+                Player copyDealer = new Player(new Hand(dealerHand));
+                Player copyMe2 = new Player(new Hand(Preconditions.checkNotNull(cardsInGame.subList(11, cardsInGame.size()))));
+                Player copyDealer2 = new Player(new Hand(dealerHand));
+                Strategy strategy1 = new Strategy(List.of(copyDealer, copyMe), 1, strategyParser, new Deck(gameDeck));
+                Strategy strategy2 = new Strategy(List.of(copyDealer2, copyMe2), 2, strategyParser, new Deck(gameDeck));
+
                 Float retPayoff1 = strategy1.getPayoff();
+                //System.out.println("strategy 1: " + retPayoff1);
                 Float retPayoff2 = strategy2.getPayoff();
+                //System.out.println("strategy 2: " + retPayoff2);
                 aggPayoff1 += retPayoff1;
                 aggPayoff2 += retPayoff2;
-
             }
             System.out.print(aggPayoff1 + "    ");
             System.out.println(aggPayoff2);
@@ -141,8 +150,6 @@ public class Parser {
 //            System.err.println(strGame);
 //            System.err.println(cards[0]);
 //            System.err.println(cards.length);
-            System.out.println(cards.length);
-            System.out.println(Arrays.toString(cards));
             throw new Exception("Invalid CSV format");
 
         }

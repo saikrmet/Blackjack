@@ -11,21 +11,29 @@ public class Deck {
 
     private Random random;
 
-
+    private Long seed;
 
     public Deck() {
         this.deck = this.initDeck();
         this.random = new Random();
+        this.seed = null;
     }
 
     public Deck(Deck deck) {
-        this.deck = new ArrayList<>(deck.getDeck());
-        this.random = deck.getRandom();
+        this.deck = new ArrayList<>();
+        for (var card: deck.getDeck()) {
+            this.deck.add(new Card(card.getRank(), card.getSuit()));
+        }
+        this.random = new Random();
+        if (deck.getSeed() != null) {
+            this.random.setSeed(deck.getSeed());
+        }
     }
 
     private List<Card> getDeck() {
         return this.deck;
     }
+
 
     private Random getRandom() {
         return this.random;
@@ -58,7 +66,12 @@ public class Deck {
         return this.deck.get(randomCard);
     }
 
+    public Long getSeed() {
+        return this.seed;
+    }
+
     public void setSeed(long seed) {
+        this.seed = seed;
         this.random.setSeed(seed);
     }
 

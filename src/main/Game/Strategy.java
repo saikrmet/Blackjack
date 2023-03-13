@@ -68,6 +68,8 @@ public class Strategy {
         for (Hand hand : me.getHands()) {
             while (!hand.isFinal()) {
                 Decision decision = this.makeDecision(hand);
+//                System.out.print(this.stratNum + "   ");
+//                System.out.println(decision);
                 switch (decision) {
                     case HIT -> {
                         Card drawnCard = this.deck.getRandomCard();
