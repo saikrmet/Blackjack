@@ -85,7 +85,7 @@ public class Parser {
                 continue;
             }
 
-            System.out.println(strGame);
+            //System.out.println(strGame);
 
             // Making Deck
             Deck gameDeck = new Deck();
@@ -121,8 +121,8 @@ public class Parser {
                 aggPayoff1 += retPayoff1;
                 aggPayoff2 += retPayoff2;
             }
-            System.out.print(aggPayoff1 + "    ");
-            System.out.println(aggPayoff2);
+            //System.out.print(aggPayoff1 + "    ");
+            //System.out.println(aggPayoff2);
             aggPayoff1 /= this.numGames;
             aggPayoff2 /= this.numGames;
 
