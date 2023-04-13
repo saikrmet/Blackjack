@@ -20,6 +20,17 @@ public class Strategy {
         DOUBLE
     }
 
+    private class StatResult {
+        Decision decision;
+        Double expectedPayout;
+
+        public StatResult(Decision decision, Double expectedPayout) {
+            this.decision = decision;
+            this.expectedPayout = expectedPayout;
+        }
+
+    }
+
     private final Player dealer;
 
     private final Player me;
@@ -149,11 +160,106 @@ public class Strategy {
             return this.makeDecisionHW1(hand);
         } else if (this.stratNum == 2) {
             return this.makeDecisionHW2(hand);
-        } else {
+        } else if (this.stratNum == 3) {
+            return this.makeDecisionStatBest(hand, this.deck).decision;
+        }
+        else {
             throw new Exception("Not a valid HW strategy number");
         }
     }
 
+    private StatResult makeDecisionStatBest(Hand hand, Deck remainingCards) {
+        // Assumes remainingCards comprises all possible cards that could be drawn by the player
+        // Assumes hand is never Bust or Final
+
+        Map<String, Double> decisions = new HashMap<>();
+
+        decisions.put("hit", simulateHit(hand, remainingCards));
+        decisions.put("stay", simulateStay(hand, remainingCards));
+        decisions.put("surrender", simulateSurrender(hand, remainingCards));
+
+        if (doubleAllowed(hand)) {
+            decisions.put("double", simulateDouble(hand, remainingCards));
+        }
+
+        if (splitAllowed(hand)) {
+            decisions.put("split", simulateSplit(hand, remainingCards));
+        }
+
+        String decision = null;
+        Double expectedPayoff = null;
+        List<String> choices = List.of("hit", "stay", "surrender", "double", "split");
+
+
+        for (var choice: choices) {
+            if (decisions.containsKey(choice)) {
+                if (decision == null) {
+                    decision = choice;
+                    expectedPayoff = decisions.get(decision);
+                } else if (decisions.get(choice) > expectedPayoff) { // maintains tiebreaker order
+                    decision = choice;
+                    expectedPayoff = decisions.get(decision);
+                }
+            }
+        }
+
+        // decision will never be null; we can always hit
+        assert decision != null;
+
+        Decision finalDecision = parseDecision(decision);
+
+        return new StatResult(finalDecision, expectedPayoff);
+
+    }
+
+    private Decision parseDecision(String decision) {
+        switch (decision) {
+            case "hit":
+                return Decision.HIT;
+            case "stay":
+                return Decision.STAY;
+            case "surrender":
+                return Decision.SURRENDER;
+            case "double":
+                return Decision.DOUBLE;
+            case "split":
+                return Decision.SPLIT;
+        }
+    }
+
+    private Boolean doubleAllowed(Hand hand) {
+        return hand.getSize() == 2;
+    }
+
+    private Boolean splitAllowed(Hand hand) {
+        return hand.getSize() == 2 && hand.getCards().get(0).equals(hand.getCards().get(1));
+    }
+
+    private Double simulateHit(Hand hand, Deck remainingCards) {
+        // simulate each card draw, call makeDecisionStatBest again
+
+        for (var card: remainingCards.getDeck()) {
+
+        }
+
+        return null;
+    }
+
+    private Double simulateStay(Hand hand, Deck remainingCards) {
+        return null;
+    }
+
+    private Double simulateDouble(Hand hand, Deck remainingCards) {
+        return null;
+    }
+
+    private Double simulateSplit(Hand hand, Deck remainingCards) {
+        return null;
+    }
+
+    private Double simulateSurrender(Hand hand, Deck remainingCards) {
+        return null;
+    }
     private Decision makeDecisionHW1(Hand hand) throws Exception {
         int hardVal = hand.getHardValue();
         if (hardVal > 11) {
@@ -189,6 +295,55 @@ public class Strategy {
         } else {
             return Decision.HIT;
         }
+    }
+
+    // Calculate payoff for a final player hand and given dealer hand
+    private Float calculatePayoff(Player me, Player dealer) throws Exception {
+        float myPayoff = 0f;
+        for (Hand myHand : me.getHands()) {
+            int factor = 1;
+            if (myHand.isDoubled()) {
+                factor = 2;
+            }
+            if (myHand.isSurrender()) {
+                myPayoff -= 0.50f;
+            } else {
+                if (myHand.isBlackJack()) {
+                    if (dealer.getHand().isBlackJack()) {
+                        myPayoff += 0;
+                    } else {
+                        myPayoff += 1.5;
+                    }
+                } else if (myHand.isBust()) {
+                    myPayoff -= factor;
+                } else if (dealer.getHand().isBlackJack()) {
+                    myPayoff -= 1;
+                } else if (dealer.getHand().isBust()) {
+                    myPayoff += factor;
+                } else {
+                    int myValue;
+                    int dealerValue;
+                    if (myHand.isSoft()) {
+                        myValue = myHand.getSoftValue();
+                    } else {
+                        myValue = myHand.getHardValue();
+                    }
+                    if (dealer.getHand().isSoft()) {
+                        dealerValue = dealer.getHand().getSoftValue();
+                    } else {
+                        dealerValue = dealer.getHand().getHardValue();
+                    }
+                    if (myValue > dealerValue) {
+                        myPayoff += factor;
+                    } else if (myValue == dealerValue) {
+                        myPayoff += 0;
+                    } else {
+                        myPayoff -= factor;
+                    }
+                }
+            }
+        }
+        return myPayoff;
     }
 
     private Float calculatePayoff() throws Exception {

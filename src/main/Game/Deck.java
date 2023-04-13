@@ -30,7 +30,7 @@ public class Deck {
         }
     }
 
-    private List<Card> getDeck() {
+    public List<Card> getDeck() {
         return this.deck;
     }
 
