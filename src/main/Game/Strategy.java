@@ -161,29 +161,28 @@ public class Strategy {
         } else if (this.stratNum == 2) {
             return this.makeDecisionHW2(hand);
         } else if (this.stratNum == 3) {
-            return this.makeDecisionStatBest(hand, this.deck).decision;
+            return this.makeDecisionStatBest(hand, this.deck, this.dealer).decision;
         }
         else {
             throw new Exception("Not a valid HW strategy number");
         }
     }
 
-    private StatResult makeDecisionStatBest(Hand hand, Deck remainingCards) {
+    private StatResult makeDecisionStatBest(Hand hand, Deck remainingCards, Player dealer) throws Exception {
         // Assumes remainingCards comprises all possible cards that could be drawn by the player
-        // Assumes hand is never Bust or Final
 
         Map<String, Double> decisions = new HashMap<>();
 
-        decisions.put("hit", simulateHit(hand, remainingCards));
-        decisions.put("stay", simulateStay(hand, remainingCards));
-        decisions.put("surrender", simulateSurrender(hand, remainingCards));
+        decisions.put("hit", simulateHit(hand, remainingCards, dealer));
+        decisions.put("stay", simulateStay(hand, remainingCards, dealer));
+        decisions.put("surrender", simulateSurrender(hand, remainingCards, dealer));
 
         if (doubleAllowed(hand)) {
-            decisions.put("double", simulateDouble(hand, remainingCards));
+            decisions.put("double", simulateDouble(hand, remainingCards, dealer));
         }
 
         if (splitAllowed(hand)) {
-            decisions.put("split", simulateSplit(hand, remainingCards));
+            decisions.put("split", simulateSplit(hand, remainingCards, dealer));
         }
 
         String decision = null;
@@ -213,18 +212,14 @@ public class Strategy {
     }
 
     private Decision parseDecision(String decision) {
-        switch (decision) {
-            case "hit":
-                return Decision.HIT;
-            case "stay":
-                return Decision.STAY;
-            case "surrender":
-                return Decision.SURRENDER;
-            case "double":
-                return Decision.DOUBLE;
-            case "split":
-                return Decision.SPLIT;
-        }
+        return switch (decision) {
+            case "hit" -> Decision.HIT;
+            case "stay" -> Decision.STAY;
+            case "surrender" -> Decision.SURRENDER;
+            case "double" -> Decision.DOUBLE;
+            case "split" -> Decision.SPLIT;
+            default -> null;
+        };
     }
 
     private Boolean doubleAllowed(Hand hand) {
@@ -235,30 +230,164 @@ public class Strategy {
         return hand.getSize() == 2 && hand.getCards().get(0).equals(hand.getCards().get(1));
     }
 
-    private Double simulateHit(Hand hand, Deck remainingCards) {
+    private Double simulateHit(Hand hand, Deck remainingCards, Player dealer) throws Exception {
         // simulate each card draw, call makeDecisionStatBest again
 
+        Double avgPayoff = 0.0;
+
         for (var card: remainingCards.getDeck()) {
+            // could make a copy of remainingCards to multithread, for now will only do recursively
+            remainingCards.removeCard(card);
+            Hand curHand = new Hand(hand.getCards());
+            curHand.addCard(card);
+
+            /**
+             * Checking terminal steps here
+             */
+
+            // check if hand was a bust
+            if (curHand.isBust()) {
+                remainingCards.addCard(card);
+                if (curHand.isDoubled()) {
+                    avgPayoff += -2;
+                    continue;
+                }
+                avgPayoff += -1;
+                continue;
+            }
+
+            // check if hand is blackjack
+            if (curHand.isBlackJack()) {
+                curHand.setFinal(true);
+                avgPayoff += simulateStay(curHand, new Deck(remainingCards), dealer);
+                remainingCards.addCard(card);
+                continue;
+            }
+
+            // Hit resulted in a non-bust non-blackjack hand. Defer to overseer function for payoff
+            // Find out ideal expected payout of perfect strategy from here
+            StatResult nextResult = makeDecisionStatBest(curHand, remainingCards, dealer);
+
+            avgPayoff += nextResult.expectedPayout;
+
+            remainingCards.addCard(card);
+        }
+
+        return avgPayoff / remainingCards.getDeck().size();
+    }
+
+    private Double simulateStay(Hand hand, Deck remainingCards, Player dealer) throws Exception {
+        // Terminal step. Recursion ends here.
+
+        // Play out dealer's hand:
+        while (!dealer.getHand().isFinal()) {
+            Decision decision = this.makeDecisionDealer(dealer.getHand());
+            switch (decision) {
+                case HIT -> {
+                    Card drawnCard = this.deck.getRandomCard();
+                    dealer.getHand().addCard(drawnCard);
+                    remainingCards.removeCard(drawnCard);
+                }
+                case STAY -> dealer.getHand().setFinal(true);
+            }
+            if (dealer.getHand().isBust()) {
+                dealer.getHand().setFinal(true);
+            }
+        }
+
+        return Double.valueOf(calculatePayoff(new Player(hand), dealer, remainingCards));
+    }
+
+    private Double simulateDouble(Hand hand, Deck remainingCards, Player dealer) throws Exception {
+
+        Double avgPayoff = 0.0;
+
+        for (var card: remainingCards.getDeck()) {
+            remainingCards.removeCard(card);
+            var curHand = new Hand(hand.getCards());
+            curHand.addCard(card);
+            curHand.setDoubled(true);
+
+            /**
+             * Check terminal outcomes
+             */
+
+            if (curHand.isBust()) {
+                curHand.setFinal(true);
+                remainingCards.addCard(card);
+                avgPayoff += -2;
+                continue;
+            }
+
+            if (curHand.isBlackJack()) {
+                curHand.setFinal(true);
+                avgPayoff += simulateStay(curHand, new Deck(remainingCards), dealer);
+                remainingCards.addCard(card);
+                continue;
+            }
+
+            // Player's hand was not Blackjack or bust
+
+            // Find out ideal expected payout of perfect strategy from here
+            StatResult nextResult = makeDecisionStatBest(curHand, remainingCards, dealer);
+
+            avgPayoff += nextResult.expectedPayout;
+
+            remainingCards.addCard(card);
 
         }
 
-        return null;
+        return avgPayoff / remainingCards.getDeck().size();
     }
 
-    private Double simulateStay(Hand hand, Deck remainingCards) {
-        return null;
+    private Double simulateSplit(Hand hand, Deck remainingCards, Player dealer) throws Exception {
+        // Split hand into two hands. Obtain best decision for first hand, do it, then given the remaining cards
+        // obtain best decision for second hand. Payout is then the sum of both payouts.
+
+        Double avgPayoff = 0.0;
+        int toRemove = 0;
+
+        // Probably a way to optimize it by iterating through a diagonal because of the symmetry here
+        for (int i = 0; i < remainingCards.getDeck().size(); i++) {
+            for (int j = 0; j < remainingCards.getDeck().size(); j++) {
+                if (i == j) {
+                    toRemove++;
+                    continue;
+                }
+
+                Hand hand1 = new Hand(List.of(hand.getCards().get(0)));
+                Hand hand2 = new Hand(List.of(hand.getCards().get(1)));
+
+                Card card1 = remainingCards.getDeck().get(i);
+                Card card2 = remainingCards.getDeck().get(j);
+
+                hand1.addCard(card1);
+                hand2.addCard(card2);
+
+                remainingCards.removeCard(card1);
+
+                avgPayoff += makeDecisionStatBest(hand1, remainingCards, dealer).expectedPayout;
+
+                remainingCards.removeCard(card2);
+
+                avgPayoff += makeDecisionStatBest(hand2, remainingCards, dealer).expectedPayout;
+
+                remainingCards.addCard(card1);
+                remainingCards.addCard(card2);
+
+
+            }
+        }
+
+        return avgPayoff / (remainingCards.getDeck().size() * remainingCards.getDeck().size() - toRemove);
     }
 
-    private Double simulateDouble(Hand hand, Deck remainingCards) {
-        return null;
-    }
-
-    private Double simulateSplit(Hand hand, Deck remainingCards) {
-        return null;
-    }
-
-    private Double simulateSurrender(Hand hand, Deck remainingCards) {
-        return null;
+    private Double simulateSurrender(Hand hand, Deck remainingCards, Player dealer) {
+        // Terminal function; recursion ends here
+        if (hand.isDoubled()) {
+            return -1.0;
+        }
+        return -0.5;
     }
     private Decision makeDecisionHW1(Hand hand) throws Exception {
         int hardVal = hand.getHardValue();
@@ -298,7 +427,10 @@ public class Strategy {
     }
 
     // Calculate payoff for a final player hand and given dealer hand
-    private Float calculatePayoff(Player me, Player dealer) throws Exception {
+    private Float calculatePayoff(Player me, Player dealer, Deck remainingCards) throws Exception {
+
+        // play out dealer's hand here if needed
+
         float myPayoff = 0f;
         for (Hand myHand : me.getHands()) {
             int factor = 1;

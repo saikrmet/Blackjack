@@ -50,6 +50,10 @@ public class Deck {
 
     }
 
+    public void addCard(Card card) {
+        this.deck.add(card);
+    }
+
 
     private List<Card> initDeck() {
         List<Card> deck = new ArrayList<>();
