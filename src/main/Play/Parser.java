@@ -225,5 +225,32 @@ public class Parser {
     }
 
 
+    public void makeStatBestDecisionTester(StrategyParser stratParser) throws Exception {
+        Deck testDeck = new Deck();
+        Hand playerHand = new Hand(List.of(testDeck.getAndRemoveRandomCard(), testDeck.getAndRemoveRandomCard()));
+        Hand dealer = new Hand(List.of(testDeck.getAndRemoveRandomCard()));
+//
+        Strategy IdealStrat = new Strategy(List.of(new Player(dealer),new Player(playerHand)), 3, stratParser, testDeck);
+//        System.out.println(playerHand);
+//        System.out.println(dealer);
+        Strategy.StatResult result;
+//        result.printResults();
+
+        testDeck = new Deck();
+        Card card1 = new Card(Rank.EIGHT, Suit.CLUBS);
+        Card card2 = new Card(Rank.THREE, Suit.SPADES);
+        Card card3 = new Card(Rank.ACE, Suit.SPADES);
+        playerHand = new Hand(List.of(card1, card2));
+        testDeck.removeCard(card1);
+        testDeck.removeCard(card2);;
+        dealer = new Hand(List.of(card3));
+        testDeck.removeCard(card3);
+        System.out.println(playerHand);
+        System.out.println(dealer);
+        result = IdealStrat.makeDecisionStatBest(playerHand, testDeck, new Player(dealer));
+        result.printResults();
+
+    }
+
 
 }

@@ -15,7 +15,10 @@ public class Main {
      */
     public static void main(String[] args) throws Exception {
 
-
+        Parser parser = new Parser();
+        parser.readFile(HW4_FILE);
+        StrategyParser strategyParser = new StrategyParser();
+        parser.makeStatBestDecisionTester(strategyParser);
 
 
         //playGame(args);

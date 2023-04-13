@@ -79,4 +79,11 @@ public class Deck {
         this.random.setSeed(seed);
     }
 
+    public Card getAndRemoveRandomCard() {
+        int randomCard = this.random.nextInt(this.deck.size());
+        Card card = this.deck.get(randomCard);
+        this.deck.remove(randomCard);
+        return card;
+    }
+
 }
