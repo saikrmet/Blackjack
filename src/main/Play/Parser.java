@@ -230,16 +230,18 @@ public class Parser {
         Hand playerHand = new Hand(List.of(testDeck.getAndRemoveRandomCard(), testDeck.getAndRemoveRandomCard()));
         Hand dealer = new Hand(List.of(testDeck.getAndRemoveRandomCard()));
 //
-        Strategy IdealStrat = new Strategy(List.of(new Player(dealer),new Player(playerHand)), 3, stratParser, testDeck);
+        //Strategy IdealStrat = new Strategy(List.of(new Player(dealer),new Player(playerHand)), 3, stratParser, testDeck);
 //        System.out.println(playerHand);
 //        System.out.println(dealer);
-        Strategy.StatResult result;
+        HW5Strategy IdealStrat = new HW5Strategy(null, 3, null, null);
+        HW5Strategy.StatResult result;
 //        result.printResults();
 
         testDeck = new Deck();
-        Card card1 = new Card(Rank.EIGHT, Suit.CLUBS);
-        Card card2 = new Card(Rank.THREE, Suit.SPADES);
-        Card card3 = new Card(Rank.ACE, Suit.SPADES);
+        Card card1 = new Card(Rank.TEN, Suit.CLUBS);
+        Card card2 = new Card(Rank.QUEEN, Suit.SPADES);
+        Card card3 = new Card(Rank.JACK, Suit.SPADES);
+        Card card4 = new Card(Rank.JACK, Suit.CLUBS);
         playerHand = new Hand(List.of(card1, card2));
         testDeck.removeCard(card1);
         testDeck.removeCard(card2);;
