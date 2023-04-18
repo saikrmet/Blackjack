@@ -4,6 +4,8 @@ import java.io.*;
 import java.util.*;
 
 import com.google.common.base.Preconditions;
+import com.google.common.cache.LoadingCache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableMap;
 import main.Game.*;
 import main.Game.Card.Suit;
@@ -91,35 +93,41 @@ public class Parser {
             Deck gameDeck = new Deck();
 
             // Giving players their cards and removing cards in play from deck
-            cardsInGame = this.generateGameState(strGame, gameDeck);
-
-            //Generate dealer's hand
-            List<Card> dealerHand = new ArrayList<>();
-            dealerHand.add(cardsInGame.get(2));
-            Player dealer = new Player(new Hand(dealerHand));
-
-            //Generate my hand
-            Player me = new Player(new Hand(Preconditions.checkNotNull(cardsInGame.subList(11, cardsInGame.size()))));
+            GameState gameState = this.generateGameState(strGame, gameDeck);
 
             Float aggPayoff1 = 0.0F;
             Float aggPayoff2 = 0.0F;
 
+            //HW5Strategy IdealStrategy = new HW5Strategy();
+            //IdealStrategy.makeDecisionStatBest()
+
             for (int i = 0; i < this.numGames; i++) {
                 gameDeck.setSeed(rand.nextLong());
                 // Running both strategies
-                Player copyMe = new Player(new Hand(Preconditions.checkNotNull(cardsInGame.subList(11, cardsInGame.size()))));
-                Player copyDealer = new Player(new Hand(dealerHand));
-                Player copyMe2 = new Player(new Hand(Preconditions.checkNotNull(cardsInGame.subList(11, cardsInGame.size()))));
-                Player copyDealer2 = new Player(new Hand(dealerHand));
-                Strategy strategy1 = new Strategy(List.of(copyDealer, copyMe), 1, strategyParser, new Deck(gameDeck));
-                Strategy strategy2 = new Strategy(List.of(copyDealer2, copyMe2), 2, strategyParser, new Deck(gameDeck));
+//                Player copyMe = new Player(new Hand(Preconditions.checkNotNull(cardsInGame.subList(11, cardsInGame.size()))));
+//                Player copyDealer = new Player(new Hand(dealerHand));
+//                Player copyMe2 = new Player(new Hand(Preconditions.checkNotNull(cardsInGame.subList(11, cardsInGame.size()))));
+//                Player copyDealer2 = new Player(new Hand(dealerHand));
+                //Strategy IdealStrategy = new HW5Strategy()
 
-                Float retPayoff1 = strategy1.getPayoff();
+
+                /**
+                 * 1. Parse the cards -> Get player hand, get other player's cards, get dealer's card
+                 * 2. Make a gameState from this information -> get player's hand, remainingCards will be
+                 * complete deck - player's cards - dealer's card - other players' cards, dealer will just be dealer
+                 * 3. pass in gameState to IdealStrategy.getPayOff(gameState)
+                 * 4. Store payoff
+                 */
+
+
+                //Strategy WikiStrategy = new Strategy(List.of(copyDealer2, copyMe2), "Wiki", strategyParser, new Deck(gameDeck));
+                //GameState state = new GameState();
+                //Double retPayoff1 = IdealStrategy.getPayoff(state);
                 //System.out.println("strategy 1: " + retPayoff1);
-                Float retPayoff2 = strategy2.getPayoff();
+                //Float retPayoff2 = WikiStrategy.getPayoff();
                 //System.out.println("strategy 2: " + retPayoff2);
-                aggPayoff1 += retPayoff1;
-                aggPayoff2 += retPayoff2;
+                //aggPayoff1 += Float.parseFloat(String.valueOf(retPayoff1));
+                //aggPayoff2 += retPayoff2;
             }
             //System.out.print(aggPayoff1 + "    ");
             //System.out.println(aggPayoff2);
@@ -136,6 +144,7 @@ public class Parser {
     }
 
 
+
     /**
      * Takes the string representation of a game and changes it to an ArrayList of Cards.
      * @param strGame the string representation of a Blackjack game (array of strings representing
@@ -143,7 +152,7 @@ public class Parser {
      * @return the ArrayList of Cards representing the current game state.
      * @throws Exception if the game is invalid (i.e. not enough cards).
      */
-    private List<Card> generateGameState(String strGame, Deck deck) throws Exception {
+    private GameState generateGameState(String strGame, Deck deck) throws Exception {
         String[] cards = strGame.split(",");
 
         if (cards.length != 13) {
@@ -168,7 +177,13 @@ public class Parser {
                 cardsInGame.add(null); // add null to indicate no card present
             }
         }
-        return cardsInGame;
+
+        List<Card> dealerCard = new ArrayList<>();
+        dealerCard.add(cardsInGame.get(2));
+        Hand dealer = new Hand(dealerCard);
+        Hand me = new Hand(Preconditions.checkNotNull(cardsInGame.subList(11, cardsInGame.size())));
+
+        return new GameState(me, dealer, deck);
     }
 
     /**
@@ -233,23 +248,25 @@ public class Parser {
         //Strategy IdealStrat = new Strategy(List.of(new Player(dealer),new Player(playerHand)), 3, stratParser, testDeck);
 //        System.out.println(playerHand);
 //        System.out.println(dealer);
-        HW5Strategy IdealStrat = new HW5Strategy(null, 3, null, null);
-        HW5Strategy.StatResult result;
+        GameCache<GameState> cache = new GameCache();
+        HW5Strategy IdealStrat = new HW5Strategy(cache);
+        Strategy.StatResult result;
 //        result.printResults();
 
         testDeck = new Deck();
         Card card1 = new Card(Rank.TEN, Suit.CLUBS);
-        Card card2 = new Card(Rank.QUEEN, Suit.SPADES);
+        Card card2 = new Card(Rank.KING, Suit.SPADES);
         Card card3 = new Card(Rank.JACK, Suit.SPADES);
         Card card4 = new Card(Rank.JACK, Suit.CLUBS);
         playerHand = new Hand(List.of(card1, card2));
         testDeck.removeCard(card1);
-        testDeck.removeCard(card2);;
+        testDeck.removeCard(card2);
         dealer = new Hand(List.of(card3));
         testDeck.removeCard(card3);
         System.out.println(playerHand);
         System.out.println(dealer);
-        result = IdealStrat.makeDecisionStatBest(playerHand, testDeck, new Player(dealer));
+        GameState state = new GameState(playerHand, dealer, testDeck);
+        result = IdealStrat.makeDecisionStatBest(state);
         result.printResults();
 
     }

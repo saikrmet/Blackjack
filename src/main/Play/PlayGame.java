@@ -40,7 +40,7 @@ public class PlayGame {
             initialGameState = this.generateRandomGame();
             dealer = initialGameState.get(0);
             me = initialGameState.get(initialGameState.size() - 1);
-            Strategy strategy = new Strategy(List.of(dealer, me), this.stratNum, strategyParser, this.deck);
+            Strategy strategy = new Strategy(List.of(dealer, me), "Wiki", strategyParser, this.deck);
             Float retPayoff = strategy.getPayoff();
             if (retPayoff > maxPayoff) {
                 maxPayoff = retPayoff;

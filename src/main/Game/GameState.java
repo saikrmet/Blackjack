@@ -1,21 +1,31 @@
 package main.Game;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.base.Objects;
 
 public class GameState {
 
-        private List<Hand> myHands;
-        private Card dealerCard;
-        private Deck deck;
-        private Strategy strategy;
+        private Hand myHand;
 
-        public GameState(List<Hand> _myHands, Card _dealerCard, Deck _newDeck, Strategy _strategy) {
-                this.myHands = _myHands;
-                this.dealerCard = _dealerCard;
+        public Map<Integer, Integer> handMap;
+
+        public Map<Integer, Integer> deckMap;
+        public Map<Integer, Integer> dealerHandMap;
+        private Hand dealerHand;
+        private Deck deck;
+
+
+        public GameState(Hand _myHand, Hand _dealerHand, Deck _newDeck) {
+                this.myHand = _myHand;
+                this.handMap = createHandMap(_myHand.getCards());
+                this.dealerHand = _dealerHand;
+                this.deckMap = createHandMap(_newDeck.getDeck());
+                this.dealerHandMap = createHandMap(_dealerHand.getCards());
                 this.deck = _newDeck;
-                this.strategy = _strategy;
+                //this.strategy = _strategy;
         }
 
         public boolean equals(Object o) { 
@@ -23,42 +33,69 @@ public class GameState {
                         return true;
                 if (!(o instanceof GameState))
                         return false;
+
                 GameState other = (GameState)o;
-                boolean handsEqual = (this.myHands == null && other.myHands == null) || (this.myHands != null && this.myHands.equals(other.myHands));
 
-                boolean handsDealerCard = (this.dealerCard == null && other.dealerCard == null) || (this.dealerCard != null && this.dealerCard.getRankValue().equals(other.dealerCard.getRankValue()));
+                boolean handsEqual = this.handMap.equals(other.handMap);
 
-                boolean handsDeck = (this.deck == null && other.deck == null) || (this.deck != null && this.deck.equals(other.deck));
+                boolean dealerEquals = this.dealerHandMap.equals(other.dealerHandMap);
 
-                boolean handsStrategy = (this.strategy == null && other.strategy == null) || (this.strategy != null && this.strategy.equals(other.strategy));
+                boolean remainingCardsEqual = this.deckMap.equals(other.deckMap);
+//                boolean handsEqual = (this.myHand == null && other.myHand == null) || (this.myHand != null && this.myHand.equals(other.myHand));
+//
+//                boolean handsDealerCard = (this.dealerCard == null && other.dealerCard == null) || (this.dealerCard != null && this.dealerCard.getRankValue().equals(other.dealerCard.getRankValue()));
+//
+//                boolean handsDeck = (this.deck == null && other.deck == null) || (this.deck != null && this.deck.equals(other.deck));
+//
+//                boolean handsStrategy = (this.strategy == null && other.strategy == null) || (this.strategy != null && this.strategy.equals(other.strategy));
 
-                return handsEqual && handsDealerCard && handsDeck && handsStrategy;
+                return handsEqual && dealerEquals && remainingCardsEqual;
         }
 
         // Maybe need a better hashcode
         public final int hashCode() {
-                return Objects.hashCode(this.myHands, this.dealerCard, this.deck, this.strategy);
+                return Objects.hashCode(this.handMap, this.dealerHandMap, this.deckMap);
                 // return 1000 * this.myHands.hashCode() + 100 * this.dealerCard.hashCode() + 10 * this.deck.hashCode() + this.strategy.hashCode();
-
         }
 
-        public List<Hand> getMyHands() {
-                return this.myHands;
+
+        private Map<Integer, Integer> createHandMap(List<Card> cards) {
+                Map<Integer, Integer> hand1Map = new HashMap<>();
+                for (var card: cards) {
+                        if (hand1Map.containsKey(card.getRankValue())) {
+                                hand1Map.put(card.getRankValue(), hand1Map.get(card.getRankValue()) + 1);
+                        } else {
+                                hand1Map.put(card.getRankValue(), 1);
+                        }
+                }
+                return hand1Map;
         }
 
-        public Card getDealerCard() {
-                return this.dealerCard;
+        public Hand getMyHand() {
+                return this.myHand;
         }
 
-        public Deck getNewDeck() {
+        public Hand getDealerHand() {
+                return this.dealerHand;
+        }
+
+        public Deck getDeck() {
                 return this.deck;
         }
 
-        public Strategy getStrategy() {
-                return this.strategy;
-        }
-
-        public void setMyHands(List<Hand> myHands) {
-                this.myHands = myHands;
-        }
+        //        public Card getDealerCard() {
+//                return this.dealerCard;
+//        }
+//
+//        public Deck getNewDeck() {
+//                return this.deck;
+//        }
+//
+//        public Strategy getStrategy() {
+//                return this.strategy;
+//        }
+//
+//        public void setMyHands(List<Hand> myHands) {
+//                this.myHands = myHands;
+//        }
 }
