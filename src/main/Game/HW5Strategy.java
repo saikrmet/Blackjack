@@ -24,11 +24,11 @@ public class HW5Strategy {
 
     }
 
-    private final Player dealer;
+    //private final Player dealer;
 
-    private final Player me;
+    //private final Player me;
 
-    private final int stratNum;
+    //private final int stratNum;
 
     private final static StrategyParser strategyParser = StrategyParser.strategyParser;
 
@@ -36,13 +36,13 @@ public class HW5Strategy {
 
 
     public HW5Strategy(List<Player> players, int stratNum, StrategyParser strategyParser, Deck deck) {
-        Preconditions.checkNotNull(players);
+        //Preconditions.checkNotNull(players);
 
-        this.dealer = players.get(0);
-        this.me = players.get(1);
-        this.stratNum = stratNum;
+        //this.dealer = players.get(0);
+        //this.me = players.get(1);
+        //this.stratNum = stratNum;
         //this.strategyParser = strategyParser;
-        this.deck = deck;
+        //this.deck = deck;
 
     }
 
@@ -70,16 +70,8 @@ public class HW5Strategy {
     }
 
     private Decision makeDecision(Hand hand) throws Exception {
-        if (this.stratNum == 1) {
-            return this.makeDecisionHW1(hand);
-        } else if (this.stratNum == 2) {
-            return this.makeDecisionHW2(hand);
-        } else if (this.stratNum == 3) {
-            return this.makeDecisionStatBest(hand, this.deck, this.dealer).decision;
-        }
-        else {
-            throw new Exception("Not a valid HW strategy number");
-        }
+        //return this.makeDecisionStatBest(hand, this.deck, this.dealer).decision;
+        return null;
     }
 
     boolean first = true;
@@ -153,7 +145,7 @@ public class HW5Strategy {
     }
 
     private Boolean hitAllowed(Hand hand) {
-        return !hand.isDoubled();
+        return !hand.isFinal();
     }
 
     private Boolean surrenderAllowed(Hand hand) {
@@ -210,35 +202,9 @@ public class HW5Strategy {
         return avgPayoff / remainingCards.getDeck().size();
     }
 
-    private Double simulateStay(Hand hand, Deck remainingCards, Player dealer) throws Exception {
-        // Terminal step. Recursion ends here.
-        
-        Deck copyRemaining = new Deck(remainingCards);
-        // Play out dealer's hand:
-        Player copyDealer = new Player(new Hand(dealer.getHand().getCards()));
-        while (!copyDealer.getHand().isFinal()) {
-            Decision decision = this.makeDecisionDealer(copyDealer.getHand());
-            switch (decision) {
-                case HIT -> {
-                    Card drawnCard = copyRemaining.getRandomCard();
-                    copyDealer.getHand().addCard(drawnCard);
-                    copyRemaining.removeCard(drawnCard);
-                }
-                case STAY -> {
-                    copyDealer.getHand().setFinal(true);
-                }
-            }
-            if (copyDealer.getHand().isBust()) {
-                copyDealer.getHand().setFinal(true);
-            }
-        }
-        return Double.valueOf(calculatePayoff(new Player(hand), copyDealer, copyRemaining));
-    }
-
     private Double simulateDouble(Hand hand, Deck remainingCards, Player dealer) throws Exception {
         //System.out.println("SIMULATING DOUBLE: " + hand.toString());
 
-        // This is a terminal step; need to update code to reflect this
 
         Double avgPayoff = 0.0;
         Deck copyRemaining = new Deck(remainingCards);
@@ -247,29 +213,17 @@ public class HW5Strategy {
             var curHand = new Hand(hand.getCards());
             curHand.addCard(card);
             curHand.setDoubled(true);
+            curHand.setFinal(true);
 
-            /**
-             * Check terminal outcomes
-             */
-
+            //System.out.println(curHand);
             avgPayoff += simulateStay(curHand, copyRemaining, dealer);
-
-            // System.out.println("average payout is currently: " + avgPayoff);
-            // System.out.println(curHand);
-            // Player's hand was not Blackjack or bust
-
-            // Find out ideal expected payout of perfect strategy from here
-            //StatResult nextResult = makeDecisionStatBest(curHand, copyRemaining, dealer);
-
-//            System.out.println("nextresult was " + nextResult.decision +" " + nextResult.expectedPayout);
-//            System.out.println("DEALER HAND: " + dealer.getHand());
-
-            //avgPayoff += nextResult.expectedPayout;
+            //System.out.println(curHand);
 
             copyRemaining.addCard(card);
 
         }
-
+        var x = avgPayoff / remainingCards.getDeck().size();
+        //System.out.println(x);
         return avgPayoff / remainingCards.getDeck().size();
     }
 
@@ -320,41 +274,60 @@ public class HW5Strategy {
         }
         return -0.5;
     }
-    private Decision makeDecisionHW1(Hand hand) throws Exception {
-        int hardVal = hand.getHardValue();
-        if (hardVal > 11) {
-            return Decision.STAY;
-        } else if (hand.isSoft() && hand.getSoftValue() > 17) {
-            return Decision.STAY;
-        }
-        return Decision.HIT;
+
+    private Double simulateStay(Hand hand, Deck remainingCards, Player dealer) throws Exception {
+        // Terminal step. Recursion ends here
+
+        var x = simulateRestOfGame(hand, remainingCards, new Player(new Hand(dealer.getHand().getCards())));
+
+        //System.out.println(x + " Hand is: " + hand);
+        //System.out.println("Player's hand is: " + hand + " Dealer's hand is: " + dealer.getHand() + " with payoff: " + x);
+
+
+        return x;
     }
 
+    private Double simulateRestOfGame(Hand hand, Deck remainingCards, Player dealer) throws Exception {
 
-    private Decision makeDecisionHW2(Hand hand) throws Exception {
-        List<Card.Rank> hardHand = List.of(Card.Rank.JACK, Card.Rank.QUEEN, Card.Rank.KING);
-        if (hand.isPair()) {
-            if (hardHand.contains(hand.getCards().get(0).getRank())) {
-                return Objects.requireNonNull(this.strategyParser.getPairsMap().get(Card.Rank.TEN))
-                        .get(this.dealer.getHand().getCards().get(0).getRank());
-            } else {
-                return this.pairStrat(this.strategyParser, hand);
-            }
-        } else if (hand.isSoft()){
-            return this.softStrat(this.strategyParser, hand);
-        } else {
-            return this.hardStrat(this.strategyParser, hand);
+        Deck copyRemaining = new Deck(remainingCards);
+
+        if (this.makeDecisionDealer(dealer.getHand())) {
+            var y = Double.valueOf(this.calculatePayoff(new Player(hand),
+                   dealer, copyRemaining));
+
+            return y;
         }
+
+        Double avgPayoff = 0.0;
+
+        for (var card: remainingCards.getDeck()) {
+            Player copyDealer = new Player(new Hand(dealer.getHand().getCards()));
+            copyRemaining = new Deck(remainingCards);
+            copyRemaining.removeCard(card);
+            copyDealer.getHand().addCard(card);
+
+            //System.out.println(copyDealer.getHand());
+
+            avgPayoff += simulateRestOfGame(hand, copyRemaining, copyDealer);
+        }
+
+        //System.out.println(avgPayoff / remainingCards.getDeck().size());
+        return avgPayoff / remainingCards.getDeck().size();
     }
 
-    private Decision makeDecisionDealer(Hand hand) throws Exception {
+    private Boolean makeDecisionDealer(Hand hand) throws Exception {
         //System.out.println("DEAKLER HAND IS: " + hand);
         if (hand.isSoft() && hand.getSoftValue() >= 17) {
-            return Decision.STAY;
+            //System.out.println("STAY");
+            return true;
+            //return Decision.STAY;
         } else if (hand.getHardValue() > 17) {
-            return Decision.STAY;
+            //System.out.println("STAY");
+            return true;
+            //return Decision.STAY;
         } else {
-            return Decision.HIT;
+            return false;
+            //return Decision.HIT;
         }
     }
 
@@ -412,31 +385,6 @@ public class HW5Strategy {
 //        System.out.println(dealer.getHand());
 //        System.out.println("was: " + myPayoff);
         return myPayoff;
-    }
-
-    private Decision pairStrat(StrategyParser strategyParser, Hand hand) throws Exception {
-        return Objects.requireNonNull(this.strategyParser.getPairsMap().get(hand.getCards().get(0).getRank()))
-                .get(this.dealer.getHand().getCards().get(0).getRank());
-    }
-
-    private Decision softStrat(StrategyParser strategyParser, Hand hand) throws Exception {
-        List<Decision> decisions = Objects.requireNonNull(Objects.requireNonNull(this.strategyParser.getSoftMap().
-                get(hand.getSoftValue())).get(this.dealer.getHand().getCards().get(0).getRank()));
-
-        if (decisions.size() == 2 && hand.getSize() != 2) {
-            return decisions.get(1);
-        }
-        return decisions.get(0);
-    }
-
-    private Decision hardStrat(StrategyParser strategyParser, Hand hand) throws Exception {
-        List<Decision> decisions = Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(this.strategyParser
-                .getHardMap().get(hand.getHardValue())).get(this.dealer.getHand().getCards().get(0).getRank())));
-
-        if (decisions.size() == 2 && hand.getSize() != 2) {
-            return decisions.get(1);
-        }
-        return decisions.get(0);
     }
 
 }
