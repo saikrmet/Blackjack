@@ -1,24 +1,12 @@
 package main.Game;
 import com.google.common.base.Preconditions;
-import com.opencsv.exceptions.CsvValidationException;
-import main.Game.Card;
-import main.Game.Hand;
-import main.Game.Player;
 import main.Play.StrategyParser;
+import main.Game.Strategy.Decision;
 
-import java.io.IOException;
 import java.util.*;
 
 
-public class Strategy {
-
-    public enum Decision {
-        STAY,
-        HIT,
-        SURRENDER,
-        SPLIT,
-        DOUBLE
-    }
+public class HW5Strategy {
 
     public class StatResult {
         Decision decision;
@@ -42,101 +30,22 @@ public class Strategy {
 
     private final int stratNum;
 
-    private final StrategyParser strategyParser;
+    private final static StrategyParser strategyParser = StrategyParser.strategyParser;
 
     private Deck deck;
 
 
-    public Strategy(List<Player> players, int stratNum, StrategyParser strategyParser, Deck deck) {
+    public HW5Strategy(List<Player> players, int stratNum, StrategyParser strategyParser, Deck deck) {
         Preconditions.checkNotNull(players);
 
         this.dealer = players.get(0);
         this.me = players.get(1);
         this.stratNum = stratNum;
-        this.strategyParser = strategyParser;
+        //this.strategyParser = strategyParser;
         this.deck = deck;
 
     }
 
-    //    /**
-//     * Naive strategy that determines whether the player hits or not.
-//     * @return a boolean indicating whether the player hits or not.
-//     */
-//    public boolean playHit() throws Exception {
-//        if (this.isSoft) {
-//            return this.computeSoftValue() <= 17;
-//        } else {
-//            return !(this.computeHardValue() > 11);
-//        }
-//    }
-
-
-    public Float getPayoff() throws Exception {
-        List<Hand> myHands = doSplit(this.me.getHand());
-        this.me.setHands(myHands);
-        //System.out.println("The dealer's hand is " + this.dealer.getHand());
-        //for (Hand hand : this.me.getHands()) {
-        //    System.out.println("The player's hand is " + hand);
-        //}
-
-
-        //Keep playing until all hands of me are final
-        for (Hand hand : me.getHands()) {
-            while (!hand.isFinal()) {
-                Decision decision = this.makeDecision(hand);
-//                System.out.print(this.stratNum + "   ");
-//                System.out.println(decision);
-                switch (decision) {
-                    case HIT -> {
-                        Card drawnCard = this.deck.getRandomCard();
-                        hand.addCard(drawnCard);
-                        this.deck.removeCard(drawnCard);
-                    }
-                    case STAY -> hand.setFinal(true);
-                    case SURRENDER -> {
-                        hand.setFinal(true);
-                        hand.setSurrender(true);
-                    }
-                    case DOUBLE -> {
-                        Card drawnCard = this.deck.getRandomCard();
-                        hand.addCard(drawnCard);
-                        this.deck.removeCard(drawnCard);
-                        hand.setFinal(true);
-                        hand.setDoubled(true);
-                    }
-                }
-                if (hand.isBust()) {
-                    hand.setFinal(true);
-                }
-            }
-        }
-        while (!this.dealer.getHand().isFinal()) {
-            Decision decision = this.makeDecisionDealer(dealer.getHand());
-            switch (decision) {
-                case HIT -> {
-                    Card drawnCard = this.deck.getRandomCard();
-                    dealer.getHand().addCard(drawnCard);
-                    this.deck.removeCard(drawnCard);
-                }
-                case STAY -> dealer.getHand().setFinal(true);
-            }
-            if (dealer.getHand().isBust()) {
-                dealer.getHand().setFinal(true);
-            }
-        }
-        //System.out.println("The dealer's final hand is " + this.dealer.getHand());
-        //for (Hand hand : this.me.getHands()) {
-        //    System.out.println("The player's final hand is " + hand);
-        //    if (hand.isDoubled()) {
-        //        System.out.println("doubled");
-        //    }
-        //    if (hand.isSurrender()) {
-        //        System.out.println("surrendered");
-        //    }
-        //}
-        //System.out.println(calculatePayoff());
-        return calculatePayoff();
-    }
 
     private List<Hand> doSplit(Hand hand) throws Exception {
         List<Hand> retVal = new ArrayList<>();
@@ -343,31 +252,19 @@ public class Strategy {
              * Check terminal outcomes
              */
 
-            if (curHand.isBust()) {
-                curHand.setFinal(true);
-                copyRemaining.addCard(card);
-                avgPayoff += -2;
-                continue;
-            }
-
-            if (curHand.isBlackJack()) {
-                curHand.setFinal(true);
-                avgPayoff += calculatePayoff(new Player(curHand), dealer, copyRemaining);
-                copyRemaining.addCard(card);
-                continue;
-            }
+            avgPayoff += simulateStay(curHand, copyRemaining, dealer);
 
             // System.out.println("average payout is currently: " + avgPayoff);
             // System.out.println(curHand);
             // Player's hand was not Blackjack or bust
 
             // Find out ideal expected payout of perfect strategy from here
-            StatResult nextResult = makeDecisionStatBest(curHand, copyRemaining, dealer);
+            //StatResult nextResult = makeDecisionStatBest(curHand, copyRemaining, dealer);
 
 //            System.out.println("nextresult was " + nextResult.decision +" " + nextResult.expectedPayout);
 //            System.out.println("DEALER HAND: " + dealer.getHand());
 
-            avgPayoff += nextResult.expectedPayout;
+            //avgPayoff += nextResult.expectedPayout;
 
             copyRemaining.addCard(card);
 
@@ -464,13 +361,6 @@ public class Strategy {
     // Calculate payoff for a final player hand and given dealer hand
     private Float calculatePayoff(Player me, Player dealer, Deck remainingCards) throws Exception {
 
-        // play out dealer's hand here if needed
-//        if (dealer.getHand().isBust()) {
-//            System.out.println("DEALER BUST");
-//        } else {
-//            System.out.println("DEALER NOT BUST");
-//        }
-
         float myPayoff = 0f;
         for (Hand myHand : me.getHands()) {
             int factor = 1;
@@ -524,63 +414,13 @@ public class Strategy {
         return myPayoff;
     }
 
-    private Float calculatePayoff() throws Exception {
-        float myPayoff = 0f;
-        for (Hand myHand : this.me.getHands()) {
-            int factor = 1;
-            if (myHand.isDoubled()) {
-                factor = 2;
-            }
-            if (myHand.isSurrender()) {
-                myPayoff -= 0.50f;
-            } else {
-                if (myHand.isBlackJack()) {
-                    if (this.dealer.getHand().isBlackJack()) {
-                        myPayoff += 0;
-                    } else {
-                        myPayoff += 1.5;
-                    }
-                } else if (myHand.isBust()) {
-                    myPayoff -= factor;
-                } else if (this.dealer.getHand().isBlackJack()) {
-                    myPayoff -= 1;
-                } else if (this.dealer.getHand().isBust()) {
-                    myPayoff += factor;
-                } else {
-                    int myValue;
-                    int dealerValue;
-                    if (myHand.isSoft()) {
-                        myValue = myHand.getSoftValue();
-                    } else {
-                        myValue = myHand.getHardValue();
-                    }
-                    if (this.dealer.getHand().isSoft()) {
-                        dealerValue = this.dealer.getHand().getSoftValue();
-                    } else {
-                        dealerValue = this.dealer.getHand().getHardValue();
-                    }
-                    if (myValue > dealerValue) {
-                        myPayoff += factor;
-                    } else if (myValue == dealerValue) {
-                        myPayoff += 0;
-                    } else {
-                        myPayoff -= factor;
-                    }
-                }
-            }
-        }
-        return myPayoff;
-
-    }
-
-
     private Decision pairStrat(StrategyParser strategyParser, Hand hand) throws Exception {
-        return Objects.requireNonNull(strategyParser.getPairsMap().get(hand.getCards().get(0).getRank()))
+        return Objects.requireNonNull(this.strategyParser.getPairsMap().get(hand.getCards().get(0).getRank()))
                 .get(this.dealer.getHand().getCards().get(0).getRank());
     }
 
     private Decision softStrat(StrategyParser strategyParser, Hand hand) throws Exception {
-        List<Decision> decisions = Objects.requireNonNull(Objects.requireNonNull(strategyParser.getSoftMap().
+        List<Decision> decisions = Objects.requireNonNull(Objects.requireNonNull(this.strategyParser.getSoftMap().
                 get(hand.getSoftValue())).get(this.dealer.getHand().getCards().get(0).getRank()));
 
         if (decisions.size() == 2 && hand.getSize() != 2) {
@@ -590,7 +430,7 @@ public class Strategy {
     }
 
     private Decision hardStrat(StrategyParser strategyParser, Hand hand) throws Exception {
-        List<Decision> decisions = Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(strategyParser
+        List<Decision> decisions = Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(this.strategyParser
                 .getHardMap().get(hand.getHardValue())).get(this.dealer.getHand().getCards().get(0).getRank())));
 
         if (decisions.size() == 2 && hand.getSize() != 2) {

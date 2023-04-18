@@ -47,6 +47,18 @@ public class StrategyParser {
      */
     private ImmutableMap<Integer, Map<Card.Rank, List<Strategy.Decision>>> hardMap;
 
+    public static StrategyParser strategyParser;
+
+    static {
+        try {
+            strategyParser = new StrategyParser();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (CsvValidationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public StrategyParser() throws IOException, CsvValidationException {
         this.strategyRankMap = this.initStratRankMap();
         this.decisionMap = this.initDecisionMap();
