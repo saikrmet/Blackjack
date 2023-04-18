@@ -1,9 +1,16 @@
 package main.Game;
 
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+
+import com.google.common.base.Objects;
+
+import main.Game.Card.Rank;
 
 public class Deck {
 
@@ -21,7 +28,7 @@ public class Deck {
 
     public Deck(Deck deck) {
         this.deck = new ArrayList<>();
-        for (var card: deck.getDeck()) {
+        for (Card card: deck.getDeck()) {
             this.deck.add(new Card(card.getRank(), card.getSuit()));
         }
         this.random = new Random();
@@ -84,6 +91,30 @@ public class Deck {
         Card card = this.deck.get(randomCard);
         this.deck.remove(randomCard);
         return card;
+    }
+
+    public Map<Rank, Integer> getRankFreq() {
+        Map<Rank, Integer> dict = new HashMap<>();
+        for(Card card: this.getDeck()) {
+            dict.put(card.getRank(), dict.getOrDefault(card.getRank(), 0) + 1);
+        }
+        return dict;
+    }
+
+    public boolean equals(Object o) { 
+        if (o == this)
+                return true;
+        if (!(o instanceof Deck))
+                return false;
+        Deck other = (Deck)o;
+        Map<Rank, Integer> thisDict = this.getRankFreq();
+        Map<Rank, Integer> otherDict = other.getRankFreq();
+
+        return (thisDict == null && otherDict == null) || (thisDict != null && thisDict.equals(otherDict));
+    }
+
+    public final int hashCode() {
+        return Objects.hashCode(this.getRankFreq());
     }
 
 }

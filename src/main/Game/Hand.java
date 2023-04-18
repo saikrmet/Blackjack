@@ -36,7 +36,7 @@ public class Hand {
      */
     public Hand(List<Card> cards) {
         List<Card> newCards = new ArrayList<>();
-        for (var card: cards) {
+        for (Card card: cards) {
             newCards.add(new Card(card.getRank(), card.getSuit()));
         }
         this.cards = newCards;
@@ -269,6 +269,21 @@ public class Hand {
             return (this.getSoftValue() == 21 && this.cards.size() == 2);
         }
         return false;
+    }
+
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Hand)) {
+            return false;
+        }
+        Hand hand = (Hand) o;
+        return (this.getHardValue() == hand.getHardValue()) && (this.isSoft() == hand.isSoft());
+    }
+
+    public final int hashCode() {
+        return Objects.hash(hardValue, isSoft);
     }
 
 
