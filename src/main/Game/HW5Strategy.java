@@ -60,46 +60,45 @@ public class HW5Strategy {
     public StatResult makeDecisionStatBest(GameState gameState) throws Exception {
         // Assumes remainingCards comprises all possible cards that could be drawn by the player
 
-        var x = this.cache.cache.getIfPresent(gameState);
+        StatResult cacheIfPresent = this.cache.cache.getIfPresent(gameState);
 
-        if (x != null) {
+        if (cacheIfPresent != null) {
             System.out.println("Cache hit!");
-            return x;
+            return cacheIfPresent;
         }
 
-        var hand = gameState.getMyHand();
-        var remainingCards = gameState.getDeck();
-        var dealer = new Player(gameState.getDealerHand());
+        Hand hand = gameState.getMyHand();
+        Deck remainingCards = gameState.getDeck();
+        Player dealer = new Player(gameState.getDealerHand());
 
         // check if bust/finalHand hand, Deck remainingCards, Player dealer
 
-        Map<String, Float> decisions = new HashMap<>();
+        Map<Decision, Float> decisions = new HashMap<>();
 
         if (hitAllowed(hand)) {
-            decisions.put("hit", simulateHit(hand, remainingCards, dealer));
+            decisions.put(Decision.HIT, simulateHit(hand, remainingCards, dealer));
         }
 
-        decisions.put("stay", simulateStay(hand, remainingCards, dealer));
+        decisions.put(Decision.STAY, simulateStay(hand, remainingCards, dealer));
 
         if (surrenderAllowed(hand)) {
-            decisions.put("surrender", simulateSurrender(hand, remainingCards, dealer));
+            decisions.put(Decision.SURRENDER, simulateSurrender(hand, remainingCards, dealer));
         }
 
         if (doubleAllowed(hand)) {
-            decisions.put("double", simulateDouble(hand, remainingCards, dealer));
+            decisions.put(Decision.DOUBLE, simulateDouble(hand, remainingCards, dealer));
         }
 
         if (splitAllowed(hand)) {
-            decisions.put("split", simulateSplit(hand, remainingCards, dealer));
+            decisions.put(Decision.SPLIT, simulateSplit(hand, remainingCards, dealer));
         }
 
-        String decision = null;
+        Decision decision = null;
         Float expectedPayoff = null;
-        List<String> choices = List.of("hit", "stay", "double", "split", "surrender");
 
-        for (var choice: choices) {
+        for (Decision choice: Decision.values()) {
             if (decisions.containsKey(choice)) {
-                if (choice.equals("double")) {
+                if (choice.equals(Decision.DOUBLE)) {
                     //System.out.println(choice + " " + decisions.get(choice));
                 }
                 if (decision == null) {
@@ -112,12 +111,7 @@ public class HW5Strategy {
             }
         }
 
-        // decision will never be null; we can always hit
-        assert decision != null;
-
-        Decision finalDecision = parseDecision(decision);
-
-        var result = new StatResult(finalDecision, expectedPayoff);
+        StatResult result = new StatResult(decision, expectedPayoff);
         System.out.println("Added gameState to Cache");
         this.cache.cache.put(gameState, result);
 
@@ -125,19 +119,8 @@ public class HW5Strategy {
 
     }
 
-    private Decision parseDecision(String decision) {
-        return switch (decision) {
-            case "hit" -> Decision.HIT;
-            case "stay" -> Decision.STAY;
-            case "surrender" -> Decision.SURRENDER;
-            case "double" -> Decision.DOUBLE;
-            case "split" -> Decision.SPLIT;
-            default -> null;
-        };
-    }
-
     private Boolean doubleAllowed(Hand hand) throws Exception {
-        return hand.getSize() == 2 && !hand.isDoubled() && !hand.isBlackJack();
+        return hand.getSize() == 2 && !hand.isDoubled() && !hand.isBlackJack() && hand.getHardValue() <= 11;
     }
 
     private Boolean hitAllowed(Hand hand) throws Exception {
@@ -199,9 +182,9 @@ public class HW5Strategy {
 
         float avgPayoff = 0.0F;
         Deck copyRemaining = new Deck(remainingCards);
-        for (var card: remainingCards.getDeck()) {
+        for (Card card: remainingCards.getDeck()) {
             copyRemaining.removeCard(card);
-            var curHand = new Hand(hand.getCards());
+            Hand curHand = new Hand(hand.getCards());
             curHand.addCard(card);
             curHand.setDoubled(true);
             curHand.setFinal(true);
@@ -277,8 +260,7 @@ public class HW5Strategy {
         Deck copyRemaining = new Deck(remainingCards);
 
         if (this.makeDecisionDealer(dealer.getHand())) {
-            return this.calculatePayoff(new Player(hand),
-                   dealer, copyRemaining);
+            return this.calculatePayoff(new Player(hand), dealer);
         }
 
         Float avgPayoff = 0.0F;
@@ -292,6 +274,9 @@ public class HW5Strategy {
             //System.out.println(copyDealer.getHand());
 
             avgPayoff += simulateRestOfGame(hand, copyRemaining, copyDealer);
+
+            //CHECK THIS!!
+            copyRemaining.addCard(card);
         }
         //System.out.println(avgPayoff / remainingCards.getDeck().size());
         return avgPayoff / remainingCards.getDeck().size();
@@ -310,7 +295,7 @@ public class HW5Strategy {
     }
 
     // Calculate payoff for a final player hand and given dealer hand
-    private Float calculatePayoff(Player me, Player dealer, Deck remainingCards) throws Exception {
+    private Float calculatePayoff(Player me, Player dealer) throws Exception {
 
         float myPayoff = 0f;
         for (Hand myHand : me.getHands()) {
