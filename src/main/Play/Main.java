@@ -40,7 +40,7 @@ public class Main {
 //        playGameHW1.printMetrics();
 //        playGameHW2.printMetrics();
         Parser parser = new Parser();
-        parser.readFile(HW4_FILE);
+        parser.readFile(HW5_FILE);
         StrategyParser stratParser = new StrategyParser();
         //HW5Strategy hw5Strategy = new HW5Strategy()
         System.out.println("Running Main...");

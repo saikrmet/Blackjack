@@ -279,11 +279,12 @@ public class Hand {
             return false;
         }
         Hand hand = (Hand) o;
-        return (this.getHardValue() == hand.getHardValue()) && (this.isSoft() == hand.isSoft());
+        return (this.getHardValue() == hand.getHardValue()) && (this.isSoft() == hand.isSoft() &&
+                this.isDoubled() == hand.isDoubled() && this.isPair() == hand.isPair());
     }
 
     public final int hashCode() {
-        return Objects.hash(hardValue, isSoft);
+        return Objects.hash(this.getHardValue(), this.isSoft(), this.isDoubled(), this.isPair());
     }
 
 

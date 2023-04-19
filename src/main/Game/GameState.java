@@ -10,20 +10,20 @@ public class GameState {
 
         private Hand myHand;
 
-        public Map<Integer, Integer> handMap;
+//        public Map<Integer, Integer> handMap;
 
         public Map<Integer, Integer> deckMap;
-        public Map<Integer, Integer> dealerHandMap;
+//        public Map<Integer, Integer> dealerHandMap;
         private Hand dealerHand;
         private Deck deck;
 
 
         public GameState(Hand _myHand, Hand _dealerHand, Deck _newDeck) {
                 this.myHand = _myHand;
-                this.handMap = createHandMap(_myHand.getCards());
+//                this.handMap = createHandMap(_myHand.getCards());
                 this.dealerHand = _dealerHand;
                 this.deckMap = createHandMap(_newDeck.getDeck());
-                this.dealerHandMap = createHandMap(_dealerHand.getCards());
+//                this.dealerHandMap = createHandMap(_dealerHand.getCards());
                 this.deck = _newDeck;
                 //this.strategy = _strategy;
         }
@@ -36,25 +36,26 @@ public class GameState {
 
                 GameState other = (GameState)o;
 
-                boolean handsEqual = this.handMap.equals(other.handMap);
-
-                boolean dealerEquals = this.dealerHandMap.equals(other.dealerHandMap);
-
-                boolean remainingCardsEqual = this.deckMap.equals(other.deckMap);
-//                boolean handsEqual = (this.myHand == null && other.myHand == null) || (this.myHand != null && this.myHand.equals(other.myHand));
+//                boolean handsEqual = this.handMap.equals(other.handMap);
 //
-//                boolean handsDealerCard = (this.dealerCard == null && other.dealerCard == null) || (this.dealerCard != null && this.dealerCard.getRankValue().equals(other.dealerCard.getRankValue()));
+//                boolean dealerEquals = this.dealerHandMap.equals(other.dealerHandMap);
+//
+                boolean remainingCardsEqual = this.deckMap.equals(other.deckMap);
+
+                boolean handsEqual = (this.myHand == null && other.myHand == null) || (this.myHand != null && this.myHand.equals(other.myHand));
+//
+                //boolean dealerEquals = (this.dealerHand == null && other.dealerHand == null) || (this.dealerHand != null && this.dealerHand.equals(other.dealerHand));
 //
 //                boolean handsDeck = (this.deck == null && other.deck == null) || (this.deck != null && this.deck.equals(other.deck));
 //
-//                boolean handsStrategy = (this.strategy == null && other.strategy == null) || (this.strategy != null && this.strategy.equals(other.strategy));
 
                 return handsEqual && dealerEquals && remainingCardsEqual;
         }
 
         // Maybe need a better hashcode
         public final int hashCode() {
-                return Objects.hashCode(this.handMap, this.dealerHandMap, this.deckMap);
+                return Objects.hashCode(this.myHand);
+                //return Objects.hashCode(this.myHand, this.dealerHand, this.deckMap);
                 // return 1000 * this.myHands.hashCode() + 100 * this.dealerCard.hashCode() + 10 * this.deck.hashCode() + this.strategy.hashCode();
         }
 
