@@ -84,10 +84,13 @@ public class Parser {
 
             counter++;
 
+
             if (counter % 2 == 0) {
                 output.append(strGame).append("\n");
                 continue;
             }
+
+
 
             //System.out.println(strGame);
 
@@ -294,6 +297,7 @@ public class Parser {
         Float avgPayoffWiki = 0.0F;
         Float avgPayoffBest = 0.0F;
         int numIters = 1000;
+
         for (int i = 0; i < numIters; i++) {
             WikiStrategy = new Strategy(List.of(new Player(new Hand(dealer.getCards())), new Player(new Hand(playerHand.getCards()))), "Wiki",
                     strategyParser, new Deck(testDeck));
