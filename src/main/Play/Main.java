@@ -8,7 +8,7 @@ import java.io.IOException;
  * Main class for running BlackJack.
  */
 public class Main {
-    public static final String HW4_FILE = "./src/test/CSVFiles/tests/hw4.csv";
+    public static final String HW5_FILE = "./src/test/CSVFiles/tests/hw5-samples.csv_annotated.csv";
 
     /**
      * Main function that runs BlackJack.
@@ -17,13 +17,13 @@ public class Main {
      */
     public static void main(String[] args) throws Exception {
 
-        Parser parser = new Parser();
-        parser.readFile(HW4_FILE);
-        StrategyParser strategyParser = new StrategyParser();
-        parser.makeStatBestDecisionTester(strategyParser);
+//        Parser parser = new Parser();
+//
+//        StrategyParser strategyParser = new StrategyParser();
+//        parser.makeStatBestDecisionTester(strategyParser);
 
 
-        //playGame(args);
+        playGame(args);
     }
 
     public static void playGame(String[] args) throws Exception {
@@ -36,7 +36,7 @@ public class Main {
 //                + "-SOLVED.csv");
 
 //        PlayGame playGameHW1 = new PlayGame(100000000, 1);
-//        PlayGame playGameHW2 = new PlayGame(100000000, 2);
+//        PlayGame playGameHW2 = new PlayGame(1000, 2);
 //        playGameHW1.printMetrics();
 //        playGameHW2.printMetrics();
         Parser parser = new Parser();
@@ -44,7 +44,7 @@ public class Main {
         StrategyParser stratParser = new StrategyParser();
         //HW5Strategy hw5Strategy = new HW5Strategy()
         System.out.println("Running Main...");
-        parser.play(stratParser, 1000000);
+        parser.play(stratParser, 100);
         System.out.println("Done...");
 
 

@@ -12,6 +12,8 @@ import main.Game.Card.Suit;
 import main.Game.Card.Rank;
 import main.Game.Strategy;
 
+import static main.Play.StrategyParser.strategyParser;
+
 /**
  * A representation of a CSV File Parser.
  */
@@ -104,11 +106,10 @@ public class Parser {
             for (int i = 0; i < this.numGames; i++) {
                 gameDeck.setSeed(rand.nextLong());
                 // Running both strategies
-//                Player copyMe = new Player(new Hand(Preconditions.checkNotNull(cardsInGame.subList(11, cardsInGame.size()))));
-//                Player copyDealer = new Player(new Hand(dealerHand));
-//                Player copyMe2 = new Player(new Hand(Preconditions.checkNotNull(cardsInGame.subList(11, cardsInGame.size()))));
-//                Player copyDealer2 = new Player(new Hand(dealerHand));
-                //Strategy IdealStrategy = new HW5Strategy()
+                Player copyMe = new Player(new Hand(gameState.getMyHand().getCards()));
+                Player copyDealer = new Player(new Hand(gameState.getDealerHand().getCards()));
+
+                HW5Strategy IdealStrategy = new HW5Strategy();
 
 
                 /**
@@ -119,15 +120,13 @@ public class Parser {
                  * 4. Store payoff
                  */
 
-
-                //Strategy WikiStrategy = new Strategy(List.of(copyDealer2, copyMe2), "Wiki", strategyParser, new Deck(gameDeck));
-                //GameState state = new GameState();
-                //Double retPayoff1 = IdealStrategy.getPayoff(state);
-                //System.out.println("strategy 1: " + retPayoff1);
-                //Float retPayoff2 = WikiStrategy.getPayoff();
+                Strategy WikiStrategy = new Strategy(List.of(copyDealer, copyMe), "Wiki", strategyParser, new Deck(gameDeck));
+                Float retPayoff1 = IdealStrategy.getPayoff(gameState);
+                //System.out.println("Ideal: " + retPayoff1);
+                Float retPayoff2 = WikiStrategy.getPayoff();
                 //System.out.println("strategy 2: " + retPayoff2);
-                //aggPayoff1 += Float.parseFloat(String.valueOf(retPayoff1));
-                //aggPayoff2 += retPayoff2;
+                aggPayoff1 += retPayoff1;
+                aggPayoff2 += retPayoff2;
             }
             //System.out.print(aggPayoff1 + "    ");
             //System.out.println(aggPayoff2);
@@ -138,6 +137,8 @@ public class Parser {
             String agg2Str = String.format("%.5f", aggPayoff2);
 
             output.append(agg1Str).append(',').append(agg2Str).append(strGame.substring(1)).append("\n");
+            System.out.println("Ideal: " + agg1Str + " Wiki: " + agg2Str + " Hand: " + gameState.getMyHand());
+            GameCache.resetCache();
 
         }
         this.writeFile(output.toString());
@@ -248,8 +249,7 @@ public class Parser {
         //Strategy IdealStrat = new Strategy(List.of(new Player(dealer),new Player(playerHand)), 3, stratParser, testDeck);
 //        System.out.println(playerHand);
 //        System.out.println(dealer);
-        GameCache<GameState> cache = new GameCache<>();
-        HW5Strategy IdealStrat = new HW5Strategy(cache);
+        HW5Strategy IdealStrat = new HW5Strategy();
         Strategy.StatResult result;
 //        result.printResults();
 
@@ -279,9 +279,32 @@ public class Parser {
         for (Card card : otherCards) {
             testDeck.removeCard(card);
         }
+
+
+
+
         GameState state = new GameState(playerHand, dealer, testDeck);
         result = IdealStrat.makeDecisionStatBest(state);
         result.printResults();
+
+        Strategy WikiStrategy;
+        Float avgPayoffWiki = 0.0F;
+        Float avgPayoffBest = 0.0F;
+        int numIters = 1000;
+        for (int i = 0; i < numIters; i++) {
+            WikiStrategy = new Strategy(List.of(new Player(new Hand(dealer.getCards())), new Player(new Hand(playerHand.getCards()))), "Wiki",
+                    strategyParser, new Deck(testDeck));
+            Random rand = new Random();
+            testDeck.setSeed(rand.nextLong());
+            var x = WikiStrategy.getPayoff();
+            //System.out.println(x);
+            avgPayoffWiki += x;
+        }
+
+        avgPayoffWiki = avgPayoffWiki / numIters;
+        avgPayoffBest = avgPayoffBest / numIters;
+
+        System.out.println("Wiki strategy average payoff:" + avgPayoffWiki);
 
     }
 

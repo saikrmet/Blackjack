@@ -17,39 +17,8 @@ public class HW5Strategy {
 
     private final static StrategyParser strategyParser = StrategyParser.strategyParser;
 
-    private GameCache<GameState> cache;
-
     private Deck deck;
 
-
-    public HW5Strategy(GameCache<GameState> cache) {
-        //Preconditions.checkNotNull(players);
-        this.cache = cache;
-
-    }
-
-
-    private List<Hand> doSplit(Hand hand) throws Exception {
-        List<Hand> retVal = new ArrayList<>();
-        if (this.makeDecision(hand) == Decision.SPLIT) {
-            //System.out.println("splitishere");
-            List<Card> hand1 = new ArrayList<>();
-            List<Card> hand2 = new ArrayList<>();
-            hand1.add(hand.getCards().get(0));
-            hand2.add(hand.getCards().get(1));
-            Card drawnCard1 = this.deck.getRandomCard();
-            hand1.add(drawnCard1);
-            this.deck.removeCard(drawnCard1);
-            Card drawnCard2 = this.deck.getRandomCard();
-            hand2.add(drawnCard2);
-            this.deck.removeCard(drawnCard2);
-            retVal.addAll(doSplit(new Hand(hand1)));
-            retVal.addAll(doSplit(new Hand(hand2)));
-        } else {
-            retVal.add(hand);
-        }
-        return retVal;
-    }
 
     private Decision makeDecision(Hand hand) throws Exception {
         //return this.makeDecisionStatBest(hand, this.deck, this.dealer).decision;
@@ -60,10 +29,10 @@ public class HW5Strategy {
     public StatResult makeDecisionStatBest(GameState gameState) throws Exception {
         // Assumes remainingCards comprises all possible cards that could be drawn by the player
 
-        StatResult cacheIfPresent = this.cache.cache.getIfPresent(gameState);
+        StatResult cacheIfPresent = GameCache.cache.getIfPresent(gameState);
 
         if (cacheIfPresent != null) {
-            System.out.println("Cache hit!");
+            //System.out.println("Cache hit");
             return cacheIfPresent;
         }
 
@@ -95,7 +64,6 @@ public class HW5Strategy {
 
         Decision decision = null;
         Float expectedPayoff = null;
-
         for (Decision choice: Decision.values()) {
             if (decisions.containsKey(choice)) {
                 if (choice.equals(Decision.DOUBLE)) {
@@ -112,8 +80,7 @@ public class HW5Strategy {
         }
 
         StatResult result = new StatResult(decision, expectedPayoff);
-        System.out.println("Added gameState to Cache");
-        this.cache.cache.put(gameState, result);
+        GameCache.cache.put(gameState, result);
 
         return result;
 
@@ -353,5 +320,6 @@ public class HW5Strategy {
     public Float getPayoff(GameState gameState) {
         return 1.0f;
     }
+
 
 }
