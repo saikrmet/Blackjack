@@ -44,12 +44,12 @@ public class GameState {
 
                 boolean handsEqual = (this.myHand == null && other.myHand == null) || (this.myHand != null && this.myHand.equals(other.myHand));
 //
-                //boolean dealerEquals = (this.dealerHand == null && other.dealerHand == null) || (this.dealerHand != null && this.dealerHand.equals(other.dealerHand));
+                boolean dealerEquals = (this.dealerHand == null && other.dealerHand == null) || (this.dealerHand != null && this.dealerHand.equals(other.dealerHand));
 //
 //                boolean handsDeck = (this.deck == null && other.deck == null) || (this.deck != null && this.deck.equals(other.deck));
 //
 
-                return handsEqual && true && true;
+                return handsEqual && remainingCardsEqual && dealerEquals;
         }
 
         // Maybe need a better hashcode
