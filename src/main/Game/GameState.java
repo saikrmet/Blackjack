@@ -49,7 +49,7 @@ public class GameState {
 //                boolean handsDeck = (this.deck == null && other.deck == null) || (this.deck != null && this.deck.equals(other.deck));
 //
 
-                return handsEqual && dealerEquals && remainingCardsEqual;
+                return handsEqual && true && true;
         }
 
         // Maybe need a better hashcode

@@ -3,6 +3,7 @@ import main.Play.StrategyParser;
 import main.Game.Strategy.Decision;
 import main.Game.Strategy.StatResult;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 import java.util.*;
 
 
@@ -35,6 +36,7 @@ public class HW5Strategy {
             //System.out.println("Cache hit");
             return cacheIfPresent;
         }
+        //System.out.println("Cache miss");
 
         Hand hand = gameState.getMyHand();
         Deck remainingCards = gameState.getDeck();
@@ -132,7 +134,7 @@ public class HW5Strategy {
             // Find out ideal expected payout of perfect strategy from here
 
             GameState nextState = new GameState(curHand, dealer.getHand(), copyRemaining);
-
+            //System.out.println("HIT called StatBest");
             StatResult nextResult = makeDecisionStatBest(nextState);
 
             avgPayoff += nextResult.expectedPayout;
@@ -155,7 +157,7 @@ public class HW5Strategy {
             curHand.addCard(card);
             curHand.setDoubled(true);
             curHand.setFinal(true);
-
+            //System.out.println("simulateDouble called StatBest");
             //System.out.println(curHand);
             avgPayoff += simulateRestOfGame(curHand, copyRemaining, dealer);
             //System.out.println(curHand);
@@ -197,8 +199,9 @@ public class HW5Strategy {
 
                 GameState gameState1 = new GameState(hand1, dealer.getHand(), copyRemaining);
                 GameState gameState2 = new GameState(hand1, dealer.getHand(), copyRemaining);
-
+                //System.out.println("simulateSplit called StatBest");
                 avgPayoff += makeDecisionStatBest(gameState1).expectedPayout;
+                //System.out.println("simulateSplit called StatBest");
                 avgPayoff += makeDecisionStatBest(gameState2).expectedPayout;
 
                 copyRemaining.addCard(card1);
@@ -317,8 +320,69 @@ public class HW5Strategy {
         return myPayoff;
     }
 
-    public Float getPayoff(GameState gameState) {
-        return 1.0f;
+    public Float getPayoff(GameState gameState) throws Exception {
+        //System.out.println("===== new getPayoff =====");
+
+        var playerHand = new Hand(gameState.getMyHand().getCards());
+        var dealerHand = new Hand(gameState.getDealerHand().getCards());
+        var remainingCards = new Deck(gameState.getDeck());
+
+        float splitFactor = 0.0F;
+
+        while (!playerHand.isFinal()) {
+            var copyGameState = new GameState(new Hand(playerHand.getCards()), new Hand(dealerHand.getCards()),
+                    new Deck(remainingCards));
+            var nextDecision = this.makeDecisionStatBest(copyGameState).decision;
+            //System.out.println(nextDecision);
+
+            switch (nextDecision) {
+                case HIT:
+                    playerHand.addCard(remainingCards.getAndRemoveRandomCard());
+                    if (playerHand.isBust()) {
+                        playerHand.setFinal(true);
+                    }
+                    break;
+                case STAY:
+                    playerHand.setFinal(true);
+                    break;
+                case SURRENDER:
+                    playerHand.setSurrender(true);
+                    playerHand.setFinal(true);
+                    break;
+                case DOUBLE:
+                    playerHand.addCard(remainingCards.getAndRemoveRandomCard());
+                    playerHand.setDoubled(true);
+                    playerHand.setFinal(true);
+                    break;
+                case SPLIT:
+                    //System.out.println("in split");
+                    var playerHand1 = new Hand(List.of(playerHand.getCards().get(0)));
+                    var playerHand2 = new Hand(List.of(playerHand.getCards().get(1)));
+
+                    playerHand = playerHand1;
+
+                    playerHand.addCard(remainingCards.getAndRemoveRandomCard());
+                    playerHand2.addCard(remainingCards.getAndRemoveRandomCard());
+
+//                    var gameState1 = new GameState(new Hand(playerHand1.getCards()), new Hand(dealerHand.getCards()),
+//                            new Deck(remainingCards));
+                    var gameState2 = new GameState(playerHand2, new Hand(dealerHand.getCards()),
+                            new Deck(remainingCards));
+
+                    splitFactor += this.getPayoff(gameState2);
+                    break;
+            }
+        }
+
+        while (!dealerHand.isFinal() && !this.makeDecisionDealer(dealerHand)) {
+            dealerHand.addCard(remainingCards.getAndRemoveRandomCard());
+            if (dealerHand.isBust()) {
+                dealerHand.setFinal(true);
+            }
+        }
+
+        return this.calculatePayoff(new Player(playerHand), new Player(dealerHand)) + splitFactor;
+
     }
 
 

@@ -81,6 +81,11 @@ public class Deck {
         return this.seed;
     }
 
+    public void removeSeed() {
+        this.random = new Random();
+        this.seed = null;
+    }
+
     public void setSeed(long seed) {
         this.seed = seed;
         this.random.setSeed(seed);

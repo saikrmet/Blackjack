@@ -97,6 +97,8 @@ public class Parser {
             // Giving players their cards and removing cards in play from deck
             GameState gameState = this.generateGameState(strGame, gameDeck);
 
+            System.out.println("Executing hand: " + gameState.getMyHand() + " Dealer hand is " + gameState.getDealerHand());
+
             Float aggPayoff1 = 0.0F;
             Float aggPayoff2 = 0.0F;
 
@@ -104,6 +106,7 @@ public class Parser {
             //IdealStrategy.makeDecisionStatBest()
 
             for (int i = 0; i < this.numGames; i++) {
+                //System.out.println("Game Number " + i);
                 gameDeck.setSeed(rand.nextLong());
                 // Running both strategies
                 Player copyMe = new Player(new Hand(gameState.getMyHand().getCards()));
@@ -254,7 +257,7 @@ public class Parser {
 //        result.printResults();
 
         testDeck = new Deck();
-        Card card1 = new Card(Rank.TWO, Suit.SPADES);
+        Card card1 = new Card(Rank.QUEEN, Suit.SPADES);
         Card card2 = new Card(Rank.FIVE, Suit.DIAMONDS);
         Card card3 = new Card(Rank.NINE, Suit.CLUBS);
 
