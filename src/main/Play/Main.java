@@ -8,7 +8,7 @@ import java.io.IOException;
  * Main class for running BlackJack.
  */
 public class Main {
-    public static final String HW5_FILE = "./src/test/CSVFiles/tests/hw5-samples.csv_annotated.csv";
+    public static final String HW5_FILE = "./src/test/CSVFiles/tests/hw5-samples.csv_annotated-NEW.csv";
 
     /**
      * Main function that runs BlackJack.

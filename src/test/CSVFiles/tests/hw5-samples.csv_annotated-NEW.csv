@@ -1,15 +1,11 @@
 ,,1f0d9,1f0d5,1f0a8,1f0d7,1f0db,1f0c1,1f0cd,1f0d3,1f0de,1f0a2,1f0c5
 ==> LINE 1 ==> Dealer's card: 9♣, My hand: [2♠, 5♢], other players' hands: [{5♣, 8♠}, {7♣, J♣}, {A♢, Q♢}, {3♣, K♣}]
-,,1f0a3,1f0c5,1f0d9,1f0b6,1f0de,1f0c4,1f0b5,1f0d1,1f0aa,1f0a2,1f0b8
-==> LINE 2 ==> Dealer's card: 3♠, My hand: [2♠, 8♡], other players' hands: [{5♢, 9♣}, {6♡, K♣}, {4♢, 5♡}, {A♣, 10♠}]
 ,,1f0b8,1f0a8,1f0dd,1f0c7,1f0da,1f0d4,1f0ba,1f0ae,1f0de,1f0b4,1f0ab
 ==> LINE 3 ==> Dealer's card: 8♡, My hand: [4♡, J♠], other players' hands: [{8♠, Q♣}, {7♢, 10♣}, {4♣, 10♡}, {K♠, K♣}]
 ,,1f0d8,1f0a5,1f0de,1f0d6,1f0cd,1f0aa,1f0db,1f0a3,1f0a8,1f0d4,1f0ba
 ==> LINE 4 ==> Dealer's card: 8♣, My hand: [4♣, 10♡], other players' hands: [{5♠, K♣}, {6♣, Q♢}, {10♠, J♣}, {3♠, 8♠}]
 ,,1f0a3,1f0b3,1f0de,1f0d7,1f0dd,1f0b5,1f0ae,1f0c1,1f0d3,1f0c5,1f0c9
 ==> LINE 5 ==> Dealer's card: 3♠, My hand: [5♢, 9♢], other players' hands: [{3♡, K♣}, {7♣, Q♣}, {5♡, K♠}, {A♢, 3♣}]
-,,1f0d3,1f0c3,1f0d8,1f0ae,1f0be,1f0a5,1f0cb,1f0c8,1f0aa,1f0c1,1f0b4
-==> LINE 6 ==> Dealer's card: 3♣, My hand: [A♢, 4♡], other players' hands: [{3♢, 8♣}, {K♠, K♡}, {5♠, J♢}, {8♢, 10♠}]
 ,,1f0ce,1f0a1,1f0bd,1f0b1,1f0a8,1f0b2,1f0c9,1f0b4,1f0aa,1f0a7,1f0d8
 ==> LINE 7 ==> Dealer's card: K♢, My hand: [7♠, 8♣], other players' hands: [{A♠, Q♡}, {A♡, 8♠}, {2♡, 9♢}, {4♡, 10♠}]
 ,,1f0d5,1f0d6,1f0de,1f0b3,1f0be,1f0d1,1f0ba,1f0b1,1f0bb,1f0c6,1f0d7
@@ -28,8 +24,6 @@
 ==> LINE 14 ==> Dealer's card: 10♡, My hand: [2♡, 7♣], other players' hands: [{7♢, 8♠}, {2♢, J♣}, {7♡, 9♡}, {5♣, K♡}]
 ,,1f0be,1f0b9,1f0de,1f0d8,1f0dd,1f0c4,1f0b5,1f0a5,1f0ad,1f0b1,1f0c2
 ==> LINE 15 ==> Dealer's card: K♡, My hand: [A♡, 2♢], other players' hands: [{9♡, K♣}, {8♣, Q♣}, {4♢, 5♡}, {5♠, Q♠}]
-,,1f0c2,1f0c6,1f0db,1f0a7,1f0d9,1f0b9,1f0bb,1f0d4,1f0ad,1f0a1,1f0c3
-==> LINE 16 ==> Dealer's card: 2♢, My hand: [A♠, 3♢], other players' hands: [{6♢, J♣}, {7♠, 9♣}, {9♡, J♡}, {4♣, Q♠}]
 ,,1f0de,1f0a5,1f0aa,1f0b5,1f0ba,1f0c9,1f0d9,1f0c5,1f0cd,1f0d3,1f0d4
 ==> LINE 17 ==> Dealer's card: K♣, My hand: [3♣, 4♣], other players' hands: [{5♠, 10♠}, {5♡, 10♡}, {9♢, 9♣}, {5♢, Q♢}]
 ,,1f0aa,1f0d7,1f0a9,1f0b2,1f0c2,1f0d3,1f0c9,1f0c8,1f0d9,1f0d6,1f0ae
