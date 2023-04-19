@@ -248,16 +248,26 @@ public class Parser {
         //Strategy IdealStrat = new Strategy(List.of(new Player(dealer),new Player(playerHand)), 3, stratParser, testDeck);
 //        System.out.println(playerHand);
 //        System.out.println(dealer);
-        GameCache<GameState> cache = new GameCache();
+        GameCache<GameState> cache = new GameCache<>();
         HW5Strategy IdealStrat = new HW5Strategy(cache);
         Strategy.StatResult result;
 //        result.printResults();
 
         testDeck = new Deck();
-        Card card1 = new Card(Rank.TEN, Suit.CLUBS);
-        Card card2 = new Card(Rank.KING, Suit.SPADES);
-        Card card3 = new Card(Rank.JACK, Suit.SPADES);
-        Card card4 = new Card(Rank.JACK, Suit.CLUBS);
+        Card card1 = new Card(Rank.TWO, Suit.SPADES);
+        Card card2 = new Card(Rank.FIVE, Suit.DIAMONDS);
+        Card card3 = new Card(Rank.NINE, Suit.CLUBS);
+
+        List<Card> otherCards = new ArrayList<>();
+        otherCards.add(new Card(Rank.FIVE, Suit.CLUBS));
+        otherCards.add(new Card(Rank.EIGHT, Suit.SPADES));
+        otherCards.add(new Card(Rank.SEVEN, Suit.CLUBS));
+        otherCards.add(new Card(Rank.JACK, Suit.CLUBS));
+        otherCards.add(new Card(Rank.ACE, Suit.DIAMONDS));
+        otherCards.add(new Card(Rank.QUEEN, Suit.DIAMONDS));
+        otherCards.add(new Card(Rank.THREE, Suit.SPADES));
+        otherCards.add(new Card(Rank.KING, Suit.SPADES));
+
         playerHand = new Hand(List.of(card1, card2));
         testDeck.removeCard(card1);
         testDeck.removeCard(card2);
@@ -265,6 +275,10 @@ public class Parser {
         testDeck.removeCard(card3);
         System.out.println(playerHand);
         System.out.println(dealer);
+
+        for (Card card : otherCards) {
+            testDeck.removeCard(card);
+        }
         GameState state = new GameState(playerHand, dealer, testDeck);
         result = IdealStrat.makeDecisionStatBest(state);
         result.printResults();
